@@ -722,5 +722,595 @@
 
 - 호출 패턴과 this 바인딩
 
+  - 자바스크립트에서 함수를 호출할 때 기존 매개변수로 전달되는 인자값에 더해, 앞서 설명한 **arguments 객체** 및 **this 인자**가 함수 내부로 암묵적으로 전달된다.
+  - 자바스크립트의 여러 가지 **함수가 호출되는 방식(호출 패턴)**에 따라 this가 다른 **객체를 참조**(this 바인딩)하기 때문에 this는 정확하게 이해할 필요가 있다. 
+
+
+
+
+
+### this 바인딩 
+
+#### 1. 객체의 메서드 호출할 때 this 바인딩
+
+- 앞에서 설명했듯이 객체의 프로퍼티가 함수일 경우, 이 함수를 메서드라고 한다.
+
+- 이러한 메서드를 호출할 때, 메서드 내부 코드에서 사용된 this는 **해당 메서드를 호출한 객체로 바인딩**된다.
+
+- **[예제 4-23]** 메서드 호출 사용 시 this 바인딩
+
+  ```javascript
+  // myObject 객체 생성
+  var myObject = {
+      name: 'foo',
+      sayName: function () {
+          console.log(this.name);
+      }
+  };
   
+  // otherObject 객체 생성
+  var otherObject = {
+      name: 'bar'
+  };
+  
+  // otherObject.sayName() 메서드
+  otherObject.sayName = myObject.sayName;
+  
+  // sayName() 메서드 호출
+  myObject.sayName();
+  otherObject.sayName();
+  
+  [출력 결과]
+  foo
+  bar
+  ```
+
+
+
+#### 2. 함수를 호출할 때 this 바인딩
+
+- 자바스크립트에서 함수를 호출하면, 해당 함수 내부 코드에서 사용된 **this는 전역 객체에 바인딩**된다.
+
+  - 브라우저에서 자바스크립트를 실행하는 경우 전역 객체는 **window** 객체가 된다.
+  - Node.js에서의 전역 객체는 **global** 객체가 된다.
+
+- 자바스크립트의 모든 전역 변수는 실제로는 이러한 전역 객체의 프로퍼티들이다.
+
+- **[예제 4-24]** 전역 객체와 전역 변수의 관계를 보여주는 예제 코드
+
+  ```javascript
+  var foo = "I'm foo";     // 전역 변수 선언
+  console.log(foo);        // (출력값) I'm foo
+  console.log(window.foo); // (출력값) I'm foo
+  ```
+
+  - 전역 변수 foo를 정의하고 출력하는 예제 코드. window.foo를 출력해도 같은 결과를 얻을 수 있다.
+
+- **[예제 4-25]** 함수를 호출할 때 this 바인딩을 보여주는 예제 코드
+
+  ```javascript
+  var test = 'This is test';
+  console.log(window.test);
+  
+  // sayFoo() 함수
+  var sayFoo = function () {
+      console.log(this.test);
+  };
+  
+  sayFoo();
+  ```
+
+  - `sayFoo()` 함수 내에서 `this.test`를 출력하고 있다. 자바스크립트에서는 함수를 호출할 때 this는 전역 객체에 바인딩된다고 했으므로, `sayFoo()` 함수가 호출된 시점에서 this는 전역 객체인 window에 바인딩된다. 즉, `this.test`는 `window.test`를 의미하므로 'This is test'가 출력되는 것이다.
+  - 이러한 함수 호출에서의 this 바인딩 특성은 **내부 함수(inner function)를 호출했을 경우**에도 그대로 적용되므로, 내부 함수에서 this를 이용할 때는 주의해야 한다.
+
+- **[예제 4-26]** 내부 함수의 this 바인딩 동작을 보여주는 예제 코드
+
+  ```javascript
+  // 전역 변수 value 정의
+  var value = 100;
+  
+  // myObject 객체 생성
+  var myObject = {
+      value: 1,
+      func1: function () {
+          this.value += 1;
+          console.log('func1() called. this.value: ' + this.value);
+  
+  
+          // func2() 내부 함수
+          func2 = function () {
+              this.value += 1;
+              console.log('func2() called. this.value: ' + this.value);
+  
+  
+              // func3() 내부 함수
+              func3 = function () {
+                  this.value += 1;
+                  console.log('func3() called. this.value: ' + this.value);
+              }
+  
+              func3();
+          }
+  
+          func2();
+      }
+  };
+  
+  myObject.func1();
+  
+  
+  [출력 결과]
+  func1() called. this.value: 2
+  func2() called. this.value: 101
+  func3() called. this.value: 102
+  ```
+
+  - func2()는 func1()을 부모 함수로 하여, func2() 내부 함수의 this는 당연히 부모 함수의 this와 같은 객체인 myObject를 가리킨다고 생각하는게 자연스러워 보인다. func3() 함수의 this도 마찬가지로, 자신의 부모 함수인 func2()의 this와 같이 myObject 객체를 가리킨다고 생각할 수 있다.
+  - 하지만 위의 가정대로 코드가 동작한다면, this.value 값의 출력 결과가 2, 3, 4 순으로 나와야 한다. 하지만 2, 101, 102 순으로 출력된다.
+  - 이렇게 실행결과가 예측과 다르게 출력된 이유는 자바스크립트에서 **내부 함수 호출 패턴을 정의해 놓지 않기 때문**이다.
+    - 내부 함수도 결국 함수이므로 이를 호출할 때는 함수 호출로 취급된다.
+    - 따라서 함수 호출 패턴 규칙에 따라 내부 함수의 this는 전역 객체(window)에 바인딩된다.
+  - 이렇게 내부 함수가 this를 참조하는 자바스크립트의 한계를 극복하려면 **부모 함수(위 예제의 func1() 메서드)의 this**를 내부 함수가 접근 가능한 **다른 변수에 저장**하는 방법이 사용된다.
+    - 보통 관례상 this 값을 저장하는 변수의 이름을 that이라고 짓는다. 
+    - 이렇게 되면 내부 함수에서는 that 변수로 부모 함수의 this가 가리키는 객체에 접근할 수 있다.
+
+- **[예제 4-27]** 내부 함수의 this 바인딩 문제를 해결한 예제 코드
+
+  ```javascript
+  // 내부 함수 this 바인딩
+  var value = 100;
+  
+  var myObject = {
+      value: 1,
+      func1: function () {
+          var that = this;
+  
+          this.value += 1;
+          console.log('func1() called. this.value: ' + this.value);
+  
+          func2 = function () {
+              that.value += 1;
+              console.log('func2() called. this.value: ' + that.value);
+  
+              func3 = function () {
+                  that.value += 1;
+                  console.log('func3() called. this.value: ' + that.value);
+              }
+              func3();
+          }
+          func2();
+      }
+  };
+  
+  myObject.func1();
+  
+  [출력 결과]
+  func1() called. this.value: 2
+  func2() called. this.value: 3
+  func3() called. this.value: 4
+  ```
+
+  - 자바스크립트에서는 이와 같은 this 바인딩의 한계를 극복하기 위해 this 바인딩을 명시적으로 할 수 있도록 call과 apply 메서드를 제공한다.
+  - 게다가, jQuery, underscore.js 등과 같은 자바스크립트 라이브러리들의 경우 bind라는 이름의 메서드를 통해, 사용자가 원하는 객체를 this에 바인딩할 수 있는 기능을 제공하고 있다.
+
+
+
+
+
+#### 3. 생성자 함수를 호출할 때 this 바인딩
+
+- 3장에서 설명했듯이 자바스크립트 객체를 생성하는 방법은 크게 객체 리터럴 방식이나 생성자 함수를 이용하는 두 가지 방법이 있다.
+  - 이번 절에서는 생성자 함수를 이용한 객체 생성 방법을 알아보자.
+- 자바스크립트의 생성자 함수는 말 그대로 자바스크립트의 객체를 생성하는 역할을 한다.
+  - 하지만 C++이나 자바와 같은 객체지향 언어에서의 생성자 함수의 형식과는 다르게 그 형식이 정해져 있는 것이 아니라, **기존 함수에 new 연산자를 붙여서 호출하면 해당 함수는 생성자 함수로 동작한다.**
+  - 이는 반대로 생각하면 일반 함수에 new를 붙여 호출하면 원치 않는 생성자 함수처럼 동작할 수 있다.
+  - 따라서 대부분의 자바스크립트 스타일 가이드에서는 특정 함수가 생성자 함수로 정의되어 있음을 알리려고 **함수 이름의 첫 문자를 대문자로 쓰기**를 권하고 있다.
+  - 자바스크립트에서는 이러한 생성자 함수를 호출할 때, 생성자 함수 코드 내부에서 this는 앞서 알아본 메서드와 함수 호출 방식에서의 this 바인딩과는 다르게 동작한다. 
+    - 이를 정확히 이해하려면 생성자 함수가 호출됐을 때 동작하는 방식을 살펴봐야 한다.
+
+
+
+
+
+##### [생성자 함수가 동작하는 방식]
+
+- new 연산자로 자바스크립트 함수를 생성자로 호출하면, 다음과 같은 순서로 동작한다.
+  1. 빈 객체 생성 및 this 바인딩
+     - 생성자 함수 코드가 실행되기 전 **빈 객체**가 생성된다.
+     - 바로 이 객체가 생성자 함수가 새로 생성하는 객체이며, 이 객체는 this로 바인딩된다. 따라서 이후 생성자 함수의 코드 내부에서 사용된 this는 이 빈 객체를 가리킨다.
+     - 하지만 여기서 생성된 객체는 엄밀히 말하면 **빈 객체는 아니다.** 
+       - 앞서 설명했듯이 자바스크립트의 모든 객체는 자신의 부모인 프로토타입 객체와 연결되어 있으며, 이를 통해 부모 객체의 프로퍼티나 메서드를 마치 자신의 것처럼 사용할 수가 있기 때문이다.
+     - 뒷 부분에서 살펴보겠지만, 이렇게 <u>생성자 함수가 생성한 객체는 자신을 생성한 **생성자 함수의 prototype 프로퍼티**가 가리키는 객체를 **자신의 프로토타입 객체**로 설정한다.</u>
+  2. this를 통한 프로퍼티 생성
+     - 이후에는 함수 코드 내부에서 this를 사용해서, 앞에서 생성된 빈 객체에 동적으로 프로퍼티나 메서드를 생성할 수 있다.
+  3. 생성된 객체 리턴
+     - 리턴문이 동작하는 방식은 경우에 따라 다르므로 주의해야 한다.
+     - 리턴문이 없는 경우 (가장 일반적인 경우)
+       - this로 바인딩된 새로 생성한 객체가 리턴된다.
+       - 이것은 명시적으로 this를 리턴해도 결과는 같다(주의 - 생성자 함수가 아닌 일반 함수를 호출할 때 리턴값이 명시되어 있지 않으면 undefined가 리턴된다).
+     - 리턴값이 새로 생성한 객체(this)가 아닌 다른 객체를 반환하는 경우
+       - 생성자 함수를 호출했다고 하더라도 this가 아닌 해당 객체가 리턴된다.
+       - 이 부분은 **함수 리턴**에서 좀 더 자세히 설명한다.
+
+
+
+- **[예제 4-28]** 생성자 함수의 동작 방식
+
+  ```javascript
+  // Person() 생성자 함수
+  var Person = function (name) {
+      // 함수 코드 실행 전 --- (1)
+      this.name = name;  --- (2)
+      // 함수 리턴        --- (3)
+  };
+  
+  // foo 객체 생성
+  var foo = new Person('foo'); --- (4)
+  console.log(foo.name);   // foo 출력
+  ```
+
+  - **생성자 함수의 동작 방식** 
+
+    
+
+    ![](https://docs.google.com/drawings/d/sG71Wead17-Ocmaha3Ae-xA/image?parent=e/2PACX-1vQiuXMoUJloXB41go11kimhAxCGB0Jhf5sdczvyrPIjH533basHPtLBcGPi59BcshFWUj6e55GqbGOO&rev=433&drawingRevisionAccessToken=hT2tGTiBEAgHow&h=338&w=601&ac=1)
+
+    
+
+  - (1): Person() 함수가 생성자로 호출되면, 함수 코드가 실행되기 전에 빈 객체가 생성된다. 여기서 생성된 빈 객체는 Person() 생성자 함수의 prototype 프로퍼티가 가리키는 객체(Person.prototype 객체)를 [[Prototype]] 링크로 연결해서 자신의 프로토타입으로 설정한다. 그리고 이렇게 생성된 객체는 생성자 함수 코드에서 사용되는 this로 바인딩된다.
+
+  - (2): this가 가리키는 빈 객체에 name이라는 동적 프로퍼티를 생성했다.
+
+  - (3): 리턴값이 특별히 없으므로 this로 바인딩한 객체가 생성자 함수의 리턴값으로 반환돼서, foo 변수에 저장된다.
+
+
+
+
+
+##### [객체 리터럴 방식과 생성자 함수를 통한 객체 생성 방식의 차이]
+
+- 자바스크립트에서 객체를 생성하는 두 가지 방법인 객체 리터럴 방식과 생성자 함수를 이용해서 객체를 생성하는 방식을 모두 알아봤다. 그렇다면 이 두 가지 방법의 차이점은 무엇일까?
+
+- **[예제 4-29]** 객체 생성 두 가징 방법(객체 리터럴 vs 생성자 함수)
+
+  ```javascript
+  // 객체 리터럴 방식으로 foo 객체 생성
+  var foo = {
+      name: 'foo',
+      age: 35,
+      gender: 'man'
+  };
+  
+  console.dir(foo);
+  
+  // 생성자 함수
+  function Person(name, age, gender, position) {
+      this.name = name;
+      this.age = age;
+      this.gender = gender;
+  }
+  
+  // Person 생성자 함수를 이용해 bar 객체, baz 객체 생성
+  var bar = new Person('bar', 33, 'woman');
+  console.dir(bar);
+  
+  var baz = new Person('baz', 25, 'woman');
+  console.dir(baz);
+  ```
+
+  - 첫 번째 차이점
+
+    - 객체 리터럴 방식으로 생성된 객체는 같은 형태의 객체를 재생성할 수 없다.
+    - 생성자 함수를 사용해 객체를 생성하면 같은 형태의 객체를 재생성할 수 있다.
+
+  - 두 번째 차이점
+
+    - 객체 리터럴 방식으로 생성한 객체 출력결과
+
+      ![](https://lh6.googleusercontent.com/78qfH-AqXKojtamliSAYEfp_coklw6MWn_di69iO7uSdj3PBikRHAEKLIsGf9dP4UeNTggCjmuQYjzVhtH3LulBcjPmIIuL5bmMpYWRx-IR0IaNc0qnxc6XeLgKXMRa9rcrQNc6D=s0)
+
+      - 객체 리터럴 방식의 경우 자신의 프로토타입 객체가 **Object (Object.prototype)**
+
+      
+
+    - 생성자 함수 방식으로 생성한 객체 출력결과
+
+      ![](https://lh3.googleusercontent.com/ZXR9WJIvvSij0Djy_5FbTmcIA7XaiygAMw_MqUeqCisf7PgUfem85WhQLwwvMl4V78Qp6rD2IxsL_KP2eGf6e_UZP6V-YROIFtzDi5R1OJGK8Az2B9EsSDF9rd6LfDTRJSs0g4nf=s0)
+
+      - 생성자 함수 방식의 경우 자신의 프로토타입 객체가 **Person (Person.prototype)**
+
+      
+
+    - 두 방식의 차이는 **프로토타입 객체(\__proto__ 프로퍼티)**에 있음을 알 수 있다.
+
+    - 이렇게 차이가 발생하는 이유는 자바스크립트 객체 생성 규칙 때문이다.
+
+    - 자바스크립트 객체는 자신을 생성한 **생성자 함수의 prototype 프로퍼티**가 가리키는 객체를 자신의 **프로토타입 객체**로 설정한다.
+
+      - 객체 리터럴 방식에서는 객체 생성자 함수는 **Object()**이며, 생성자 함수 방식의 경우는 **생성자 함수** 자체(예제에서는 `Person()`)이므로 두 가지 방식이 다른 프로토타입 객체가 있는 것이다.
+
+  
+
+  
+
+  #### [생성자 함수를 new를 붙이지 않고 호출할 경우]
+
+  - 앞서 설명했듯이 자바스크립트에서는 일반 함수와 생성자 함수가 별도의 차이가 없다. new를 붙여서 함수를 호출하면 생성자 함수로 동작하는 것이다.
+    - 때문에 객체 생성을 목적으로 작성한 생성자 함수를 new 없이 호출하거나 일반 함수를 new를 붙여서 호출할 경우 코드에서 오류가 발생할 수 있다.
+    - 그 이유는 **<u>일반 함수 호출과 생성자 함수를 호출할 때 this 바인딩 방식이 다르기 때문</u>**이다.
+
+  
+
+  - this 바인딩 방식 차이
+    - 일반 함수 호출: this가 window 전역 객체에 바인딩
+    - 생성자 함수 호출: this가 새로 생성되는 빈 객체에 바인딩
+
+  
+
+  - **[예제 4-30]** new를 붙이지 않고 생성자 함수 호출 시의 오류
+
+    ```javascript
+    // 생성자 함수
+    function Person(name, age, gender, position) {
+        this.name = name;
+        this.age = age;
+        this.gender = gender;
+    }
+    
+    var qux = Person('qux', 20, 'man');
+    console.log(qux); // (출력값) undefined
+    
+    console.log(window.name); // (출력값) qux
+    console.log(window.age); // (출력값) 20
+    console.log(window.gender); // (출력값) man
+    ```
+
+    - 생성자 함수 `Person()`을 new 없이 일반 함수 형태로 호출할 경우, this는 함수 호출이므로 전역 객체인 window 객체로 바인딩된다.
+    - 따라서 이 코드는 Person 객체를 생성해서 이를 qux 변수에 저장하려는 원래 의도와는 다르게 this가 바인딩된 **window 객체에 동적으로 name, age, gender 프로퍼티가 생성**된다.
+    - 그리고 `Person()` 함수는 리턴값이 없다. 생성자 함수는 별도의 리턴값이 정해져 있지 않은 경우에 새로 생성된 객체가 리턴되지만, 일반 함수를 호출할 때는 undefined가 리턴된다. 그래서 `console.log(qux)`에서 undefined가 출력된 것이다.
+
+
+
+- 강제로 인스턴스 생성하기
+  
+  - 더글라스 크락포드와 같은 자바스크립트 전문가들은 객체를 생성하는 다음과 같은 별도의 코드 패턴을 사용하기도 한다.
+  
+  - **[예제]**
+  
+    ```javascript
+    function A(arg) {
+        if(!(this instanceof A))  // new 키워드 생략한 경우
+            return new A(arg);
+        this.value = arg ? arg : 0;
+    }
+    
+    var a = new A(100);
+    var b = A(10);
+    
+    console.log(a.value); // (출력값) 100
+    console.log(b.value); // (출력값) 10
+    console.log(global.value); // (출력값) undefined
+    ```
+  
+    - this가 A의 인스턴스가 아니라면, new로 호출된 것이 아님을 의미하고, 이 경우 new로 A를 호출하여 반환하게 하였다.
+  
+    - 어떤 코드에서는 앞과 같이 함수의 이름을 그대로 쓰지 않고 다음과 같은 표현식을 쓰곤 한다.
+  
+      ```javascript
+      if(!(this instanceof arguments.callee)) ...
+      ```
+  
+      - `arguments.callee`가 곧 호출된 함수를 가리킨다.
+      - 이와 같이 하면, 특정 함수 이름과 상관없이 이 패턴을 공통으로 사용하는 모듈을 작성할 수 있는 장점이 있다.
+  
+    - 이 패턴으로 함수 사용자가 함수 작성자의 의도와는 다르게 함수를 호출할 때에도 문제가 발생하지 않게 한다.
+
+
+
+#### 4. call과 apply 메서드를 이용한 명시적인 this 바인딩
+
+- 자바스크립트는 내부적인 this 바인딩 이외에도 this를 특정 객체에 **명시적으로 바인딩**시키는 방법도 제공한다.
+
+  - 이를 가능하게 하는 것이 바로 **함수 객체의 기본 프로퍼티**에서 간단히 설명한 **apply()**와 **call()** 메서드다.
+
+  - 이 메서드들은 모든 함수의 부모 객체인 Function.prototype 객체의 메서드이므로, 모든 함수는 다음과 같은 형식으로 apply() 메서드를 호출하는 것이 가능하다.
+
+    ```javascript
+    function.apply(thisArg, argArray);
+    ```
+
+  - call() 메서드는 apply() 메서드와는 기능이 같고 단지 넘겨받는 인자의 형식만 다르다.
+
+
+
+- `apply()` 메서드
+
+  - apply() 메서드를 호출하는 주체는 함수고, apply() 메서드도 this를 특정 객체에 바인딩할 뿐 결국 본질적인 기능은 **함수 호출**이다.
+
+    - 가령, Person()이라는 함수가 있고, Person.apply() 이렇게 호출하면 이것의 기본적인 기능은 Person() 함수를 호출하는 것이다.
+
+  - apply() 메서드의 인자
+
+    - 첫 번째 인자 `thisArg`: apply() 메서드를 호출한 함수 내부에서 사용한 this에 바인딩할 객체를 가리킨다. 즉, 첫 번째 인자로 넘긴 객체가 this로 명시적으로 바인딩되는 것이다.
+    - 두 번째 인자 `argArray`: 함수를 호출할 때 넘길 인자들의 배열을 가리킨다.
+
+  - **[예제 4-31]** apply() 메서드를 이용한 명시적인 this 바인딩
+
+    ```javascript
+    // 생성자 함수
+    function Person(name, age, gender) {
+        this.name = name;
+        this.age = age;
+        this.gender = gender;
+    }
+    
+    
+    // foo 빈 객체 생성
+    var foo = {};
+    
+    // apply() 메서드 호출
+    Person.apply(foo, ['foo', 30, 'man']);
+    console.dir(foo);
+    ```
+
+    - 위 코드는 결국 **Person('foo', 30, 'man') 함수를 호출**하면서, **this를 foo 객체에 명시적으로 바인딩**하는 것을 의미한다.
+
+
+
+- `call()` 메서드
+
+  - call() 메서드의 경우는 apply()와 기능은 같지만, apply()의 두 번째 인자에서 배열 형태로 넘긴 것을 각각 하나의 인자로 넘긴다.
+
+    ```javascript
+    Person.call(foo, 'foo', 30, 'man');
+    ```
+
+    
+
+- 이러한 apply()나 call() 메서드는 this를 원하는 값으로 명시적으로 매핑해서 특정 함수나 메서드를 호출할 수 있다는 장점이 있다.
+
+  - 이들의 대표적인 용도가 바로 arguments 객체와 같은 **유사 배열 객체에서 배열 메서드를 사용**하는 경우다.
+
+  - arguments 객체는 실제 배열이 아니므로 pop(), shift()와 같은 표준 배열 메서드를 사용할 수 없다.
+
+  - 하지만 apply() 메서드를 이용하면 가능하다.
+
+  - **[예제 4-32]** apply() 메서드를 활용한 arguments 객체의 배열 표준 메서드 slice() 활용 코드
+
+    ```javascript
+    function myFunction() {
+        console.dir(arguments);
+    
+        // arguments.shift();  에러 발생   --- (1)
+    
+        // arguments 객체를 배열로 변환
+        var args = Array.prototype.slice.apply(arguments); --- (2)
+        console.dir(args);
+    }
+    
+    myFunction(1, 2, 3); --- (3)
+    ```
+
+    - (1): 배열에서는 shift() 메서드를 사용해 첫 번째 원소를 쉽게 삭제할 수 있지만, arguments 객체는 length 프로퍼티만을 가진 유사 객체 배열이므로, 앞 코드에서 주석을 제거하고 arguments.shift()와 같이 표준 배열 메서드를 호출하면 에러가 발생하며 프로그램이 종료한다.
+
+    - (2): 이러한 경우 apply() 메서드로 arguments 객체에서 마치 배열 메서드가 있는 것처럼 처리할 수 있다. 이를 가능케 하는 것이 바로 다음 코드다.
+
+      `Array.prototype.slice.apply(arguments)`
+
+      앞서 살펴본 apply() 메서드의 동작 방식을 떠올리며 코드를 해석하면 다음과 같다.
+
+      **'Array.prototype.slice() 메서드를 호출해라. 이때 this는 arguemtns 객체로 바인딩해라.'**
+
+      결국 이 말은 arguments 객체가 Array.prototype.slice() 메서드를 마치 자신의 메서드인 양 **arguments.slice()**와 같은 형태로 메서드를 호출하라는 것이다.
+
+      여기서 **Array.prototype**은 모든 배열 객체의 부모 역할을 하는 자바스크립트 기본 프로토타입 객체로서 slice() 등을 비롯한 push(), pop()과 같은 배열 표준 메서드가 있다.
+
+      slice(start, end) 메서드는 이 메서드를 호출한 배열의 start 인덱스에서 end-1 인덱스까지 복사한 배열을 리턴한다. end 인자를 지정하지 않을 경우 기본값은 배열의 length 값이다. slice() 메서드에 아무 인자도 넘기지 않을 경우에는 전체 배열이 복사된다.
+
+      Array.prototype.slice.apply(arguments)의 결과값은 apply() 메서드의 두 번째 인자로 slice() 메서드를 호출할 때 사용할 인자를 넘기지 않았으므로, arguments 객체로 인자 없이 slice() 메서드를 호출한 형태가 된다.
+
+      따라서 args 변수에는 arguments 객체의 모든 요소를 그대로 복사한 배열이 들어가게 된다.
+
+      출력해보면 arguments와 args 모두 같은 프로퍼티가 있는 것처럼 보이지만 두 객체의 **\__proto__ 프로퍼티**는 다르다는 것을 확인할 수 있다.
+
+      즉, arguments는 객체이므로 프로토타입이 Object.prototype인 반면에 args는 배열이므로 Array.prototype이 프로토타입인 것을 알 수 있다.
+
+
+
+
+
+
+
+- 함수 리턴
+
+  - **<u>자바스크립트 함수는 항상 리턴값을 반환한다</u>**.
+
+  - 특히, return 문을 사용하지 않았더라도 다음의 규칙으로 항상 리턴값을 전달하게 된다.
+
+  - **리턴 규칙 1) 일반 함수나 메서드는 리턴값을 지정하지 않을 경우, undefined 값이 리턴된다.**
+
+    - **[예제 4-34]** return 문 없는 일반 함수의 리턴값 확인
+
+      ```javascript
+      // noReturnFunc() 함수
+      var noReturnFunc = function () {
+          console.log('This function has no return statement.');
+      };
+      
+      var result = noReturnFunc();
+      console.log(result);  // (출력값) undefined
+      ```
+
+      - 앞 예제에서 noReturnFunc()와 같이 return 문이 없는 함수의 경우, 함수를 호출할 때 **undefined 값**이 리턴된다.
+
+  - **리턴 규칙 2) 생성자 함수에서 리턴값을 지정하지 않을 경우 생성된 객체가 리턴된다.**
+
+    - 생성자 함수에서 별도의 리턴값을 지정하지 않을 경우 this로 바인딩된 새로 생성된 객체가 리턴된다. 때문에 생성자 함수에서는 일반적으로 리턴값을 지정하지 않는다.
+
+    - 생성자 함수의 경우 리턴값을 처리하는 몇 가지 예외 상황이 있다.
+
+    - 만약 다음 예제와 같이 생성자 함수에서 this로 바인딩되는 생성된 객체가 아닌 다른 객체를 리턴한다면 어떻게 될 것인가?
+
+    - **[예제 4-35]** 생성자 함수에서 명시적으로 객체를 리턴했을 경우
+
+      ```javascript
+      // Person() 생성자 함수
+      function Person(name, age, gender) {
+          this.name = name;
+          this.age = age;
+          this.gender = gender;
+      
+          // 명시적으로 다른 객체 반환
+          return {name: 'bar', age: 20, gender: 'woman'};
+      }
+      
+      var foo = new Person('foo', 30, 'man');
+      console.dir(foo);
+      ```
+
+      - 생성자 함수의 리턴값을 새로 생성한 객체가 아니라, 객체 리터럴 방식의 특정 객체로 지정한 경우 new 연산자로 Person() 생성자 함수를 호출해서 새로운 객체를 생성하더라도, 리턴값에서 명시적으로 넘긴 객체나 배열이 리턴된다.
+
+    - 생성자 함수의 리턴값으로 넘긴 값이 객체가 아닌 불린, 숫자, 문자열의 경우는 이러한 리턴값을 무시하고 this로 바인딩된 객체가 리턴된다.
+
+      - **[예제 4-36]** 생성자 함수에서 명시적으로 기본 타입 값을 리턴했을 경우
+
+        ```javascript
+        function Person(name, age, gender) {
+            this.name = name;
+            this.age = age;
+            this.gender = gender;
+        
+            return 100;
+        }
+        
+        var foo = new Person('foo', 30, 'man');
+        console.log(foo);
+        
+        [출력 결과]
+        Person { name: 'foo', age: 30, gender: 'man' }
+        ```
+
+
+
+
+
+## 4.5 프로토타입 체이닝
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
