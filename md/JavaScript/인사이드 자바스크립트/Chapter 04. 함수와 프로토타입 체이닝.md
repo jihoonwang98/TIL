@@ -1296,21 +1296,332 @@
 
 ## 4.5 프로토타입 체이닝
 
+- 프로토타입의 두 가지 의미
+
+  - 자바스크립트는 기존 C++이나 자바 같은 OOP 언어와는 다른 **프로토타입 기반의 객체지향 프로그래밍**을 지원한다.
+
+  - 자바와 같은 OOP에서는 클래스를 정의하고 이를 통해 객체를 생성하지만, 자바스크립트에서는 이러한 클래스 개념이 없다.
+
+    - 대신에 객체 리터럴이나 앞서 설명했던 생성자 함수로 객체를 생성한다.
+    - 이렇게 생성된 객체의 부모 객체가 바로 '프로토타입' 객체다.
+    - 즉, 상속 개념과 마찬가지로 자식 객체는 부모 객체가 가진 프로퍼티 접근이나 메서드를 상속받아 호출하는 것이 가능하다.
+
+  - 앞서 여러 번 강조했듯이 자바스크립트의 모든 객체는 자신의 부모인 프로토타입 객체를 가리키는 참조 링크 형태의 숨겨진 프로퍼티가 있다.
+
+    - ECMAScript에서는 이러한 링크를 **암묵적 프로토타입 링크(implicit prototype link)**라고 부르며 이러한 링크는 모든 객체의 [[Prototype]] 프로퍼티에 저장된다. (이 책에서는 이러한 링크를 **[[Prototype]] 링크**라고 명명한다.)
+
+  - 여기서 주의해야 할 점이 있다. 앞에서 **prototype 프로퍼티**에서 설명했던 <u>함수 객체의 **prototype 프로퍼티**와 객체의 숨은 프로퍼티인 **[[Prototype]]** 링크를 구분해야 한다</u>는 점이다.
+
+    - 이 둘의 차이점을 알려면 다음과 같은 **자바스크립트의 객체 생성 규칙**을 알아야 한다.
+
+    - 자바스크립트에서 모든 객체는 자신을 생성한 생성자 함수의 **prototype 프로퍼티**가 가리키는 **프로토타입 객체**를 자신의 부모 객체로 설정하는 **[[Prototype]] 링크**로 연결한다.
+
+    - **[예제 4-37]** prototype 프로퍼티와 [[Prototype]] 링크 구분
+
+      ```javascript
+      // Person 생성자 함수
+      function Person(name) {
+          this.name = name;
+      }
+      
+      // foo 객체 생성
+      var foo = new Person('foo');
+      
+      console.dir(Person);
+      console.dir(foo);
+      ```
+
+      ![](https://docs.google.com/drawings/d/sfHeiGkkABHbfJ2sJEeLKbQ/image?parent=e/2PACX-1vQiuXMoUJloXB41go11kimhAxCGB0Jhf5sdczvyrPIjH533basHPtLBcGPi59BcshFWUj6e55GqbGOO&rev=270&drawingRevisionAccessToken=t9jRkYrMsTrEkA&h=408&w=601&ac=1)
+
+      - Person() 생성자 함수는 prototype 프로퍼티로 자신과 링크된 **프로토타입 객체 Person.prototype**를 가리킨다.
+
+      - 앞서 설명한 자바스크립트의 객체 생성 규칙에 의하면 Person() 생성자 함수로 생성된 foo 객체는 Person() 함수의 프로토타입 객체를 [[Prototype]] 링크로 연결한다.
+
+      - prototype 프로퍼티는 함수의 입장에서 자신과 링크된 프로토타입 객체를 가리키고 있으며,
+
+        이에 반해 [[Prototype]] 링크는 객체의 입장에서 자신의 부모 객체인 프로토타입 객체를 내부의 숨겨진 링크로 가리키고 있다.
+
+      - 결국, 자바스크립트에서 객체를 생성하는 건 생성자 함수의 역할이지만, 생성된 객체의 실제 부모 역할을 하는 건 생성자 자신이 아닌 생성자의 prototype 프로퍼티가 가리키는 프로토타입 객체다.
 
 
 
 
 
+- 객체 리터럴 방식으로 생성된 객체의 프로토타입 체이닝
+
+  - 자바스크립트에서 객체는 자기 자신의 프로퍼티뿐만 아니라, 자신의 부모 역할을 하는 프로토타입 객체의 프로퍼티 또한 마치 자신의 것처럼 접근하는 게 가능하다. 이것을 가능케 하는 게 바로 **프로토타입 체이닝**이다.
+
+  - **[예제 4-38]** 객체 리터럴 방식에서의 프로토타입 체이닝
+
+    ```javascript
+    var myObject = {
+        name: 'foo',
+        sayName: function () {
+            console.log('My name is ' + this.name);
+        }
+    }
+    
+    myObject.sayName();  // (출력값) My name is foo
+    console.log(myObject.hasOwnProperty('name'));  // (출력값) true
+    console.log(myObject.hasOwnProperty('nickName'));  // (출력값) false
+    myObject.sayNickName();  // Uncaught TypeError
+    ```
+
+    - myObject는 name 프로퍼티와 sayName() 메서드를 가진 객체다.
+    - sayName() 메서드의 결과값은 제대로 출력되지만, sayNickName() 메서드는 myObject의 메서드가 아니므로 에러가 발생한다.
+    - 그런데 <u>myObject 객체에 hasOwnProperty() 메서드가 없음에도 결과는 정상적으로 출력된다.</u>
+      - 왜 myObject 객체가 hasOwnProperty() 메서드를 호출할 때는 에러가 발생하지 않았을까?
+      - 이를 이해하려면 객체 리터럴 방식으로 생성한 객체와 프로토타입 체이닝의 개념을 살펴봐야 한다.
+
+  - 3장 객체 생성에서 설명했듯이 객체 리터럴로 생성한 객체는 **Object()**라는 내장 생성자 함수로 생성된 것이다.
+
+    - Object() 생성자 함수도 함수 객체이므로 prototype이라는 프로퍼티 속성이 있다.
+    
+    - 따라서 앞서 설명한 자바스크립트의 규칙으로 생성한 객체 리터럴 형태의 myObject는 다음 그림처럼 Object() 함수의 prototype 프로퍼티가 가리키는 Object.prototype 객체를 자신의 프로토타입 객체로 연결한다.
+    
+      
+    
+      **[객체 리터럴 방식에서의 객체와 프로토타입 객체의 관계]**
+    
+      ![](https://docs.google.com/drawings/d/s5I4skzWU7m9n01grhjsviA/image?parent=e/2PACX-1vQiuXMoUJloXB41go11kimhAxCGB0Jhf5sdczvyrPIjH533basHPtLBcGPi59BcshFWUj6e55GqbGOO&rev=189&drawingRevisionAccessToken=RkUbPjMUryAnDQ&h=463&w=601&ac=1)
+    
+  - 프로토타입 체이닝
+  
+    - 자바스크립트에서 특정 객체의 프로퍼티나 메서드에 접근하려고 할 때, 해당 객체에 접근하려는 프로퍼티 또는 메서드가 없다면 **[[Prototype]] 링크**를 따라 자신의 부모 역할을 하는 프로토타입 객체의 프로퍼티를 차례대로 검색하는 것을 **프로토타입 체이닝**이라고 한다.
 
 
 
+- 생성자 함수로 생성된 객체의 프로토타입 체이닝
+
+  - 생성자 함수로 객체를 생성하는 경우는 객체 리터럴 방식과 약간 다른 프로토타입 체이닝이 이뤄진다.
+
+  - 하지만 두 가지 방식 모두 다음과 같은 기본 원칙을 잘 지키고 있다.
+
+    - 자바스크립트에서 모든 **객체**는 자신을 생성한 **생성자 함수**의 **prototype 프로퍼티가 가리키는 객체**를 자신의 **프로토타입 객체(부모 객체)**로 취급한다.
+
+  - **[예제 4-39]** 생성자 함수 방식에서의 프로토타입 체이닝
+
+    ```javascript
+    // Person() 생성자 함수
+    function Person(name, age, hobby) {
+        this.name = name;
+        this.age = age;
+        this.hobby = hobby;
+    }
+    
+    // foo 객체 생성
+    var foo = new Person('foo', 30, 'tennis');
+    
+    // 프로토타입 체이닝
+    console.dir(foo.hasOwnProperty('name'));  // true
+    
+    // Person.prototype 객체 출력
+    console.dir(Person.prototype);
+    ```
+
+    - foo 객체의 생성자는 Person() 함수이므로, foo 객체의 프로토타입 객체는 Person.prototype이 된다.
+
+    - foo.hasOwnProperty() 메서드를 호출했지만, foo 객체는 hasOwnProperty() 메서드가 없어서 프로토타입 체이닝으로 foo의 부모 객체인 Person.prototype 객체에서 hasOwnProperty() 메서드를 찾는다. 그러나 함수에 연결된 프로토타입 객체는 디폴트로 **constructor 프로퍼티**만을 가진 객체이므로 hasOwnProperty() 메서드는 없다. 하지만 Person.prototype 역시 자바스크립트 객체이므로 Object.prototype을 프로토타입 객체로 가진다. 따라서 프로토타입 체이닝은 Object.prototype 객체로 계속 이어진다. 그리고 Object.prototype 객체의 hasOwnProperty() 메서드가 실행되므로 에러가 발생하지 않고 true가 출력된다.
+
+      
+
+      **[생성자 함수 방식에서의 객체와 프로토타입 객체의 관계]**
+
+      ![](https://docs.google.com/drawings/d/sMvJdV8lSjSJjjJ90DDJ6Sw/image?parent=e/2PACX-1vQiuXMoUJloXB41go11kimhAxCGB0Jhf5sdczvyrPIjH533basHPtLBcGPi59BcshFWUj6e55GqbGOO&rev=208&drawingRevisionAccessToken=NkSkekqOJy9U7w&h=510&w=601&ac=1)
 
 
 
+- 프로토타입 체이닝의 종점
+  - 자바스크립트에서 Object.prototype 객체는 **프로토타입 체이닝의 종점**이다.
+    - 앞에서 살펴봤듯이 객체 리터럴 방식이나 생성자 함수를 이용한 방식이나 결국엔 Object.prototype에서 프로토타입 체이닝이 끝나는 것을 알 수 있다.
+    - 이것을 달리 해석하면, 다음 그림과 같이 객체 리터럴 방식이나 생성자 함수 방식에 상관없이 모든 자바스크립트 객체는 프로토타입 체이닝으로 Object.prototype 객체가 가진 프로퍼티와 메서드에 접근하고, 서로 공유가 가능하다는 것을 알 수 있다.
 
 
 
+- 기본 데이터 타입 확장
+
+  - 앞서 자바스크립트의 모든 객체가 프로토타입 체이닝으로 Object.prototype에 정의한 메서드를 사용 가능하다는 것을 살펴봤다.
+
+  - 즉, Object.prototype에 정의된 메서드들은 자바스크립트의 모든 객체의 표준 메서드라고 볼 수 있다.
+
+  - 이와 같은 방식으로 자바스크립트의 숫자, 문자열, 배열 등에서 사용되는 표준 메서드들의 경우, 이들의 프로토타입인 **Number.prototype, String.prototype, Array.prototype** 등에 정의되어 있다.
+
+    - 물론 이러한 기본 내장 프로토타입 객체 또한 **Object.prototype**을 자신의 프로토타입으로 가지고 있어서 프로토타입 체이닝으로 연결된다.
+
+  - 자바스크립트는 Object.prototype, String.prototype 등과 같이 표준 빌트인 프로토타입 객체에도 사용자가 직접 정의한 메서드들을 추가하는 것을 허용한다.
+
+    - **[예제 4-40]** String 기본 타입에 메서드 추가
+
+      ```javascript
+      String.prototype.testMethod = function () {
+      	console.log('This is the String.prototype.testMethod()');
+      };
+      
+      var str = "this is test";
+      str.testMethod();
+      
+      console.dir(String.prototype);
+      ```
+
+      ![](https://docs.google.com/drawings/d/e/2PACX-1vSqVv-tANRbLyiXh3cibAviKfCx-w11fGpZ9edzhty7sbuhaycbuG7msALbRJbjUEsJ7ZN8E-TY7O2u/pub?w=960&h=720)
+
+- 프로토타입도 자바스크립트 객체다
+
+  - 함수가 생성될 때, 자신의 prototype 프로퍼티에 연결되는 프로토타입 객체는 디폴트로 constructor 프로퍼티만을 가진 객체다.
+
+  - 당연히 **프로토타입 객체 역시 자바스크립트 객체**이므로 일반 객체처럼 동적으로 프로퍼티를 추가/삭제하는 것이 가능하다.
+
+    - 그리고 이렇게 변경된 프로퍼티는 실시간으로 프로토타입 체이닝에 반영된다.
+
+  - **[예제 4-41]** 프로토타입 객체의 동적 메서드 생성 예제 코드
+
+    ```javascript
+    // Person() 생성자 함수
+    function Person(name) {
+        this.name = name;
+    }
+    
+    // foo 객체 생성
+    var foo = new Person('foo');
+    
+    // 프로토타입 객체에 sayHello() 메서드 정의
+    Person.prototype.sayHello = function () { 
+    	console.log('Hello');
+    }
+    
+    foo.sayHello(); // Hello
+    ```
+
+    
 
 
 
+- 프로토타입 메서드와 this 바인딩
 
+  - 프로토타입 객체는 메서드를 가질 수 있다(이 책에서는 프로토타입 객체 메서드를 짧게 **프로토타입 메서드**라고도 부를 것이다).
+
+  - 만약 프로토타입 메서드 내부에서 this를 사용한다면 이는 어디에 바인딩될 것인가?
+
+    - 이에 대한 해답은 앞서 살펴본 **객체의 메서드를 호출할 때 this 바인딩**에서 설명한 this 바인딩 규칙을 그대로 적용하면 된다.
+
+    - 즉, 메서드 호출 패턴에서의 this는 그 메서드를 호출한 객체에 바인딩된다는 것을 기억하자.
+
+    - **[예제 4-42]** 프로토타입 메서드와 this 바인딩
+
+      ```javascript
+      // Person() 생성자 함수
+      function Person(name) {
+          this.name = name;
+      }
+      
+      // getName() 프로토타입 메서드
+      Person.prototype.getName = function () {
+          return this.name;
+      };
+      
+      // foo 객체 생성
+      var foo = new Person('foo');
+      
+      console.log(foo.getName());  // (출력값) foo
+      
+      // Person.prototype 객체에 name 프로퍼티 동적 추가
+      Person.prototype.name = 'person';
+      
+      console.log(Person.prototype.getName());  // (출력값) person
+      ```
+
+      - foo 객체에서 getName() 메서드를 호출하면, getName() 메서드는 foo 객체에서 찾을 수 없으므로 프로토타입 체이닝이 발생한다. foo 객체의 프로토타입 객체인 Person.prototype에서 getName() 메서드가 있으므로, 이 메서드가 호출된다. 이때 getName() 메서드를 호출한 객체는 foo이므로, this는 foo 객체에 바인딩된다. 따라서 foo.getName()의 결과값으로 foo가 출력된다.
+      - Person.prototype.getName() 메서드와 같이 프로토타입 체이닝이 아니라, 바로 Person.prototype 객체에 접근해서 getName() 메서드를 호출하면 어떻게 될까? 
+        - 이때는 getName() 메서드를 호출한 객체가 Person.prototype이므로 this도 여기에 바인딩된다. 그리고 Person.prototype 객체에 name 프로퍼티를 동적으로 추가하고 'person'을 저장했으므로 this.name은 'person'이 출력된다.
+
+      ![](https://docs.google.com/drawings/d/e/2PACX-1vTTixoDwjjqFXSE3jajkgsimACDEJuh9DtwF_EN-fSJHkbmoxRZ51-_squOpw6Cdha8BMDfbnxxs5DP/pub?w=960&h=720)
+
+- 디폴트 프로토타입은 다른 객체로 변경이 가능하다
+
+  - 디폴트 프로토타입 객체는 함수가 생성될 때 같이 생성되며, 함수의 prototype 프로퍼티에 연결된다.
+
+  - 자바스크립트에서는 이렇게 함수를 생성할 때 해당 함수와 연결되는 **디폴트 프로토타입 객체를 다른 일반 객체로 변경하는 것이 가능하다**.
+
+    - 이러한 특징을 이용해서 객체지향의 상속을 구현한다.
+
+  - 여기서 주의할 점이 있다. 
+
+    - 생성자 함수의 프로토타입 객체가 변경되면, 변경된 시점 이후에 생성된 객체들은 변경된 프로토타입 객체로 [[Prototype]] 링크를 연결한다는 점을 기억해야 한다.
+    - 이에 반해 생성자 함수의 프로토타입이 변경되기 이전에 생성된 객체들은 기존 프로토타입 객체로의 [[Prototype]] 링크를 그대로 유지한다.
+
+  - **[예제 4-43]** 프로토타입 객체 변경
+
+    ```javascript
+    // Person() 생성자 함수
+    function Person(name) {
+        this.name = name;
+    }
+    
+    console.log(Person.prototype.constructor);  // Person(name)
+    
+    // foo 객체 생성
+    var foo = new Person('foo');
+    console.log(foo.country);  // undefined
+    
+    // 디폴트 프로토타입 객체 변경
+    Person.prototype = {
+        country: 'korea',
+    };
+    console.log(Person.prototype.constructor);  // Object()
+    
+    // bar 객체 생성
+    var bar = new Person('bar');
+    console.log(foo.country);  // undefined
+    console.log(bar.country);  // korea
+    console.log(foo.constructor);  // Person(name)
+    console.log(bar.constructor);  // Object()
+    ```
+
+    ![](https://docs.google.com/drawings/d/e/2PACX-1vSBMPYhP94myL28HLoZIO8R1EVZp1mBjtSzFUSShnMfknqaYs2MSvxsxaNgpawuZaY6GdOGCmVZEYJ3/pub?w=1072&h=737)
+
+    - Person() 함수를 생성할 때 디폴트로 같이 생성되는 Person.prototype 객체는 자신과 연결된 Person() 생성자 함수를 가리키는 constructor 프로퍼티만을 가진다. 때문에 Person.prototype.constructor는 Person() 생성자 함수를 가리킨다.
+
+    - foo 객체를 생성했다. 객체 생성 규칙에 따라 foo 객체는 Person.prototype 객체를 자신의 프로토타입으로 연결한다. 그러나 foo 객체는 country 프로퍼티가 없고 또한, 디폴트 프로토타입 객체 Person.prototype도 country 프로퍼티가 없으므로 프로토타입 체이닝이 일어나도 결국 undefined 값이 출력된다.
+
+    - 앞서 설명했듯이 자바스크립트에서는 디폴트 프로토타입 객체 또한 변경이 가능하다. 여기서는 객체 리터럴 방식으로 생성한 country 프로퍼티를 가진 객체로 프로토타입 객체(Person.prototype)를 변경했다.
+
+      그렇다면 Person.prototype.constructor는 어떤 값일까? 변경한 프로토타입 객체는 country 프로퍼티만 있으므로, 디폴트 프로토타입 객체처럼 **constructor 프로퍼티가 없다**. 이 경우도 똑같이 프로토타입 체이닝이 발생한다. 변경한 프로토타입 객체는 객체 리터럴 방식으로 생성했으므로 **Object.prototype**을 [[Prototype]] 링크로 연결한다. 따라서 Object.prototype 객체로 프로토타입 체이닝이 발생한다. Object.prototype 역시 Object() 생성자 함수와 연결된 빌트인 프로토타입 객체여서, Object() 생성자 함수를 constructor 프로퍼티에 연결하고 있다. 따라서 Person.prototype.constructor 값은 **Object() 생성자 함수**가 출력된다.
+
+    - 이제 다시 bar 객체를 생성했다. 이때 Person() 생성자 함수의 prototype 프로퍼티는 디폴트 프로토타입 객체가 아닌 새로 변경된 프로토타입 객체를 가리키고 있다. 따라서 bar 객체는 새로 변경된 프로토타입 객체를 [[Prototype]] 링크로 가리키게 된다.
+
+
+
+- 객체의 프로퍼티 읽기나 메서드를 실행할 때만 프로토타입 체이닝이 동작한다
+
+  - 객체의 특정 프로퍼티를 읽으려고 할 때, 프로퍼티가 해당 객체에 없는 경우 프로토타입 체이닝이 발생한다.
+
+  - 반대로 객체에 있는 특정 프로퍼티에 값을 쓰려고 한다면 이때는 프로토타입 체이닝이 일어나지 않는다.
+
+    - 자바스크립트는 객체에 없는 프로퍼티에 값을 쓰려고 할 경우 동적으로 객체에 프로퍼티를 추가한다.
+
+  - **[예제 4-44]** 프로토타입 체이닝과 동적 프로퍼티 생성
+
+    ```javascript
+    // Person() 생성자 함수
+    function Person(name) {
+    	this.name = name;
+    }
+    
+    Person.prototype.country = 'Korea';
+    
+    var foo = new Person('foo');
+    var bar = new Person('bar');
+    console.log(foo.country); // Korea
+    console.log(bar.country); // Korea
+    foo.country = 'USA';
+    
+    console.log(foo.country); // USA
+    console.log(bar.country); // Korea
+    ```
+
+    ![](https://docs.google.com/drawings/d/e/2PACX-1vQAECB3Karn6TIFGgLGXhnB034GwDaRklFbl9vLwCth1H1IWyga7s1MB5gYfz_X6KoQKKIIww9wTLZE/pub?w=960&h=720)
+
+    - foo와 bar 객체는 둘 다 Person.prototype 객체를 프로토타입으로 가진다.
+    - 처음에는 foo, bar 객체 둘 다 country 프로퍼티가 없으므로 프로토타입 체이닝이 이뤄지면서 Person.prototype의 country 프로퍼티인 'Korea'가 출력된다.
+    - foo.country에 'USA'값을 저장하면, 프로토타입 체이닝이 동작하는 것이 아니라, foo 객체에 country 프로퍼티값이 동적으로 생성된다.
+    - 그러므로 foo.country는 프로토타입 체이닝 없이 바로 'USA' 값이 출력되는 반면, bar 객체는 프로토타입 체이닝을 거쳐 'Korea'가 출력된다.
