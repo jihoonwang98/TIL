@@ -605,4 +605,260 @@
     exam1(2);
     ```
 
+    - 앞 예제에서는 `outerFunc()` 함수를 호출하고 반환되는 함수 객체인 `innerFunc()`가 exam1으로 참조된다. 이것은 exam1(n)의 형태로 실행될 수 있다.
     
+    - 여기서 `outerFunc()`가 실행되면서 생성되는 변수 객체가 스코프 체인에 들어가게 되고, 이 스코프 체인은 innerFunc의 스코프 체인으로 참조된다.
+    
+      - 즉, `outerFunc()` 함수가 종료되었지만, 여전히 내부 함수(`innerFunc()`)의 [[scope]]으로 참조되므로 가비지 컬렉션의 대상이 되지 않고, 여전히 접근 가능하게 살아있다.
+      - 따라서 이후에 exam1(n)을 호출하여도, `innerFunc()`에서 참조하고자 하는 변수 local에 접근할 수 있다. 
+      - 클로저는 이렇게 만들어진다.
+      - 이 outerFunc 변수 객체의 프로퍼티값은 여전히 (심지어 실행 컨텍스트가 끝났음에도) 읽기 및 쓰기까지 가능하다.
+    
+    - 앞 예제의 스코프 체인을 그림으로 나타내면 다음과 같다.
+    
+      ![](https://docs.google.com/drawings/d/e/2PACX-1vSDHf4OjA3w2H21viYJ9oAlXHBRX02AdXbQNLvmsvtRohfMxt3kMAfxAiaLVByrDYrWTu2fuIm6CmgQ/pub?w=1194&h=1143)
+    
+      - 따라서 `exam1(2)`를 호출하면, arg1, arg2, local 값은 outerFunc 변수 객체에서 찾고, innerArg는 innerFunc 변수 객체에서 찾는다.
+      - 결과는 ((2 + 4) / (2 + 8))가 된다.
+    
+      > 위 그림을 보듯이 `innerFunc()`에서 접근하는 변수 대부분이 스코프 체인의 첫 번째 객체가 아닌 그 이후의 객체에 존재한다.
+      >
+      > 이는 성능 문제를 유발시킬 수 있는 여지가 있다.
+      >
+      > 대부분의 클로저에서는 스코프 체인에서 뒤쪽에 있는 객체에 자주 접근하므로, 성능을 저하시키는 이유로 지목되기도 한다.
+      >
+      > 게다가 앞에서 알아본 대로 클로저를 사용한 코드가 그렇지 않은 코드보다 메모리 부담이 많아진다.
+      >
+      > 그렇다고 클로저를 쓰지 않는 것은 자바스크립트의 강력한 기능 하나를 무시하고 사용하는 것과 다름이 없다.
+      >
+      > 따라서 클로저를 영리하게 사용하는 지혜가 필요하며, 이를 위해선 많은 프로그래밍 경험을 쌓아야 한다.
+
+
+
+- 클로저의 활용
+
+  - 클로저는 성능적인 면과 자원적인 면에서 약간 손해를 볼 수 있으므로 무차별적으로 사용하면 안 된다.
+
+  - 이 장에서는 아주 전형적인 클로저의 예제 코드를 소개한다.
+
+  - 7장 함수형 프로그래밍에서 소개할 대부분의 예제가 클로저를 활용한 것이므로 참고하길 바란다.
+
+  - **특정 함수에 사용자가 정의한 객체의 메서드 연결하기**
+
+    - **[예제 5-9]**
+
+      ```javascript
+      function HelloFunc(func) {
+          this.greeting = "hello";
+      }
+      
+      HelloFunc.prototype.call = function (func) {
+          func ? func(this.greeting) : this.func(this.greeting);
+      };
+      
+      var userFunc = function (greeting) {
+          console.log(greeting);
+      };
+      
+      var objHello = new HelloFunc();
+      objHello.func = userFunc;
+      objHello.call();
+      ```
+
+      - 함수 HelloFunc는 greeting 변수가 있고, func 프로퍼티로 참조되는 함수를 `call()` 함수로 호출한다.
+      - 사용자는 func 프로퍼티에 자신이 정의한 함수를 참조시켜 호출할 수 있다.
+      - 다만, `HelloFunc.prototype.call()`을 보면 알 수 있듯이 자신의 지역 변수인 greeting만을 인자로 사용자가 정의한 함수에 넘긴다.
+      - 앞 예제에서 사용자는 `userFunc()` 함수를 정의하여 `HelloFunc.func()`에 참조시킨 뒤, `HelloFunc()`의 지역 변수인 greeting을 화면에 출력시킨다.
+
+    - 위 예제에서 `HelloFunc()`는 greeting만을 인자로 넣어 사용자가 인자로 넘긴 함수를 실행시킨다.
+
+    - 그래서 사용자가 정의한 함수도 한 개의 인자를 받는 함수를 정의할 수밖에 없다. 
+
+    - 여기서 사용자가 원하는 인자를 더 넣어서 `HelloFunc()`를 이용하여 호출하려면 어떻게 해야 할까?
+
+    - **[예제 5-10]**
+
+      ```javascript
+      function HelloFunc(func) {
+          this.greeting = "hello";
+      }
+      
+      HelloFunc.prototype.call = function (func) {
+          func ? func(this.greeting) : this.func(this.greeting);
+      };
+      
+      var userFunc = function (greeting) {
+          console.log(greeting);
+      };
+      
+      var objHello = new HelloFunc();
+      objHello.func = userFunc;
+      
+      // 여기서부터 새로운 코드
+      
+      function saySomething(obj, methodName, name) {
+          return (function (greeting) {
+              return obj[methodName](greeting, name);
+          });
+      }
+      
+      function newObj(obj, name) {
+          obj.func = saySomething(this, 'who', name);
+          return obj;
+      }
+      
+      newObj.prototype.who = function (greeting, name) {
+          console.log(greeting + ' ' + (name || 'everyone'));
+      }
+      
+      var obj1 = new newObj(objHello, 'zzoon');
+      obj1.call();
+      ```
+
+      - 예제 5-10에서 새로운 함수 `newObj()`를 선언하였다.
+
+        - 이 함수는 `HelloFunc()`의 객체를 좀 더 자유롭게 활용하려거 정의한 함수다.
+        - 첫 번째 인자로 받는 obj는 `HelloFunc()`의 객체가 되고,
+        - 두 번째 인자는 사용자가 출력을 원하는 사람 이름이 된다.
+
+      - `var obj1 = new newObj(objHello, 'zzoon');`
+
+        - 위 코드로 다음 코드가 실행된다.
+
+        - ```javascript
+          obj.func = saySomething(this, 'who', name);
+          return obj;
+          ```
+
+        - 첫 번째 인자 obj의 func 프로퍼티에 `saySomething()` 함수에서 반환되는 함수를 참조하고, 반환한다.
+
+        - 결국 obj1은 인자로 넘겼던 objHello 객체에서 func 프로퍼티에 참조된 함수만 바뀐 객체가 된다.
+
+        - 따라서 다음과 같이 호출할 수 있다. 
+
+          `obj1.call();`
+
+        - 이 코드의 실행결과, newObj.prototype.who 함수가 호출되어 사용자가 원하는 결과인 "hello zzoon"을 출력한다.
+
+      - 그렇다면 `saySomething()` 함수 안에서 어떤 작업이 수행되는 지 살펴보자.
+
+        ```javascript
+        function saySomething(obj, methodName, name) {
+            return (function (greeting) {
+                return obj[methodName](greeting, name);
+            });
+        }
+        ```
+
+        - 첫 번째 인자: newFunc 객체 - obj1
+
+        - 두 번째 인자: 사용자가 정의한 메서드 이름 - 'who'
+
+        - 세 번재 인자: 사용자가 원하는 사람 이름값 - 'zzoon'
+
+        - 반환: 사용자가 정의한 `newFunc.prototype.who()` 함수를 반환하는 `helloFunc()`의 func 함수
+
+          
+
+        - 이렇게 반환되는 함수가 HelloFunc이 원하는 `function(greeting) {}` 형식의 함수가 되는데, 이것이 HelloFunc 객체의 func로 참조된다.
+
+        - `obj1.call()`로 실행되는 것은 실질적으로 `newFunc.prototype.who()`가 된다.
+
+        - 이와 같은 방식으로 사용자는 자신의 객체 메서드인 who 함수를 HelloFunc에 연결시킬 수 있다.
+
+        - 여기서 클로저는 `saySomething()`에서 반환되는 `function(greeting) {}`이 되고, 이 클로저는 자유 변수 obj, methodName, name을 참조한다.
+
+      
+
+    - 위 예제 5-10은 정해진 형식의 함수를 콜백해주는 라이브러리가 있을 경우, 그 정해진 형식과는 다른 형식의 사용자 정의 함수를 호출할 때 유용하게 사용된다.
+
+      - 예를 들어 브라우저에서는 onclick.onmouseover와 같은 프로퍼티에 해당 이벤트 핸들러를 사용자가 정의해 놓을 수가 있는데, 이 이벤트 핸들러의 형식은 `function(event) {}`이다. 
+      - 이를 통해 브라우저는 발생한 이벤트를 event 인자로 사용자에게 넘겨주는 방식이다.
+      - 여기에 event 외의 원하는 인자를 더 추가한 이벤트 핸들러를 사용하고 싶을 때, 앞과 같은 방식으로 클로저를 적절히 활용할 수 있다.
+
+
+
+- 함수의 캡슐화
+
+  - 다음과 같은 함수를 작성한다고 가정해보자.
+
+    **"I am XXX. I live in XXX. I'am XX years old"라는 문장을 출력하는데, XX 부분은 사용자에게 인자로 입력 받아 값을 출력하는 함수**
+
+  - 가장 먼저 생각할 수 있는 것은 앞 문장 템플릿을 전역 변수에 저장하고, 사용자의 입력을 받은 후, 이 전역 변수에 접근하여 완성된 문장을 출력하는 방식으로 함수를 작성하는 것이다.
+
+  - **[예제 5-11]**
+
+    ```javascript
+    var buffAr = [
+        'I am ',
+        '',
+        '. I live in ',
+        '',
+        '. I\'am ',
+        '',
+        ' years old.',
+    ];
+    
+    function getCompletedStr(name, city, age) {
+        buffAr[1] = name;
+        buffAr[3] = city;
+        buffAr[5] = age;
+    
+        return buffAr.join('');
+    }
+    
+    var str = getCompletedStr('zzoon', 'seoul', 16);
+    console.log(str);
+    ```
+
+    - 위 방식은 단점이 있다.
+
+    - 바로 buffAr라는 배열은 전역 변수로서, 외부에 노출되어 있다는 점이다.
+
+      - 이는 다른 함수에서 이 배열에 쉽게 접근하여 값을 바꿀 수도 있고, 실수로 같은 이름의 변수를 만들어 버그가 생길 수도 있다.
+
+        
+
+  - 앞 예제의 경우, 클로저를 활용하여 buffAr을 추가적인 스코프에 넣고 사용하게 되면, 이 문제를 해결할 수 있다.
+
+  - **[예제 5-12]**
+
+    ```javascript
+    var getCompletedStr = (function() {
+        var buffAr = [
+            'I am ',
+            '',
+            '. I live in ',
+            '',
+            '. I\'am ',
+            '',
+            ' years old.',
+        ];
+    
+        return (function (name, city, age) {
+            buffAr[1] = name;
+            buffAr[3] = city;
+            buffAr[5] = age;
+    
+            return buffAr.join('');
+        });
+    })();
+    
+    var str = getCompletedStr('zzoon', 'seoul', 16);
+    console.log(str);
+    ```
+
+    - 위 예제에서 가장 먼저 주의해서 봐야 할 점은 변수 getCompletedStr에 익명의 함수를 즉시 실행시켜 반환되는 함수를 할당하는 것이다.
+
+    - 이 반환되는 함수가 클로저가 되고, 이 클로저는 자유 변수 buffAr을 스코프 체인에서 참조할 수 있다.
+
+    - 클로저에 있는 스코프 체인을 그림으로 그려보면 다음과 같다.
+
+      ![](https://docs.google.com/drawings/d/e/2PACX-1vRiSeG_FziOIw93pxMKw1o_nXDtzoc2E4sdcGQgE5YRCgYA_bRShMdHwOOX7Gn6wfw4AlP2dE32g8ir/pub?w=1225&h=1134)
+
+
+
+- setTimeout()에 지정되는 함수의 사용자 정의
+
+
+
