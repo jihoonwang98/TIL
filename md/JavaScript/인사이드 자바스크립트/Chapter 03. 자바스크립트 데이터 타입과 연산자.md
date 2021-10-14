@@ -680,7 +680,7 @@
 
       
 
-    - ![](https://docs.google.com/drawings/d/swSiYDPLXkBTT_UzOvUx_xw/image?parent=e/2PACX-1vQiuXMoUJloXB41go11kimhAxCGB0Jhf5sdczvyrPIjH533basHPtLBcGPi59BcshFWUj6e55GqbGOO&rev=90&drawingRevisionAccessToken=dlt1NmNWT7_LiQ&h=422&w=427&ac=1)
+    - ![](https://docs.google.com/drawings/d/svT4c277GALbY7upW1S9GYQ/image?parent=e/2PACX-1vQiuXMoUJloXB41go11kimhAxCGB0Jhf5sdczvyrPIjH533basHPtLBcGPi59BcshFWUj6e55GqbGOO&rev=1&drawingRevisionAccessToken=OiMkgXKUSbks6A&h=422&w=427&ac=1)
 
     
 
@@ -839,7 +839,6 @@
     arr.name = 'number_array';
     arr[3] = 'red';
     
-    
     for(var prop in arr) {
         console.log(prop, arr[prop]);
     }
@@ -851,6 +850,7 @@
     3 red
     color blue
     name number_array
+    
     
     
     for (var i = 0; i < arr.length; i++) {
