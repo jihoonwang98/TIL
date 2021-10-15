@@ -95,11 +95,61 @@
 
 
 
+그 외 시간나면 작성해야 함..
 
 
 
 
 
+### 접근자 (Accessors)
+
+- TypeScript는 객체의 멤버에 대한 접근을 가로채는 방식으로 `getters/setters`를 지원한다.
+
+  - 이를 통해 각 객체의 멤버에 접근하는 방법을 세밀하게 제어할 수 있다.
+
+- 간단한 클래스를 `get`과  `set`을 사용하도록 변환해보자.
+
+  - **getters와 setters가 없는 예제**
+
+    ```typescript
+    class Employee {
+    	fullName: string;
+    }
+    
+    let employee = new Employee();
+    employee.fullName = 'Bob Smith';
+    if(employee.fullName) {
+    	console.log(employee.fullName);
+    }
+    ```
+
+  - **getters와 setters를 이용한 예제**
+
+    ```typescript
+    const fullNameMaxLength = 10;
+    
+    class Employee {
+    	private _fullName: string;
+      
+      get fullName(): string {
+        return this._fullName;
+      }
+      
+      set fullName(newName: string) {
+        if(newName && newName.length > fullNameMaxLength) {
+          throw new Error('fullName has a max length of ' + fullNameMaxLength);
+        }
+        
+        this._fullName = newName;
+      }
+    }
+    
+    let employee = new Employee();
+    employee.fullName = 'Bob Smith';
+    if(employee.fullName) {
+      console.log(employee.fullName);
+    }
+    ```
 
 
 
