@@ -1,5 +1,9 @@
 ### Typescript
 
+
+
+### 기본 타입
+
 - 변수 선언
   - `let 변수명: 타입명 = 초기화_값`
 
@@ -110,7 +114,14 @@
       let c: Color = Color.Green;
       ```
 
-      
+    - `enum`의 유용한 기능 중 하나는 매겨진 값을 사용해 enum 멤버의 이름을 알아낼 수 있다는 것이다.
+
+      예를 들어, 위의 예제에서 `2`라는 값이 위의 어떤 `Color` enum 멤버와 매칭되는지 알 수 없을 때, 이에 일치하는 이름을 알아낼 수 있습니다.
+
+      ```
+      enum Color {Red = 1, Green, Blue}
+      ... 숮어중
+      ```
 
   - Any
 
@@ -119,4 +130,63 @@
   - Null and Undefined
 
   - Never
+
+
+
+### 인터페이스
+
+- Our First Interface
+
+  ```typescript
+  function printLabel(labeledObj: { label: string }) {
+      console.log(labeledObj.label);
+  }
+  // labeldObj 객체는 string 타입의 label 프로퍼티를 가지고 있기만 하면 된다.
+  // 꼭 label 프로퍼티 하나만을 가질 필요는 없다.
+  
+  let myObj = {size: 10, label: "Size 10 Object"};
+  printLabel(myObj);
+  ```
+
+  - `printLabel` 함수는 `string` 타입 `label`을 갖는 객체를 하나의 매개변수로 가집니다. 
+    - 이 객체가 실제로는 더 많은 프로퍼티를 갖고 있지만, 컴파일러는 *최소한* 필요한 프로퍼티가 있는지와 타입이 잘 맞는지만 검사합니다. TypeScript가 관대하지 않은 몇 가지 경우는 나중에 다루겠습니다.
+
+- 이번엔 같은 예제를, 문자열 타입의 프로퍼티 `label`을 가진 인터페이스로 다시 작성해보자.
+
+  ```typescript
+  interface LabeledValue {
+  	label: string;
+  }
+  
+  function printLabel(labeledObj: LabeledValue) {
+    console.log(labeledObj.label);
+  }
+  
+  let myObj = {
+    size: 10, 
+    label: 'Size 10 Object'
+  };
+  printLabel(myObj);
+  ```
+
+  - `LabeledValue` 인터페이스는 이전 예제의 요구사항을 똑같이 기술하는 이름으로 사용할 수 있다.
+  - 이 인터페이스는 여전히 `문자열` 타입의 `label ` 프로퍼티 하나를 가진다는 것을 의미합니다.
+    - <u>다른 언어처럼 `printLabel`에 전달한 객체가 이 인터페이스를 구현해야 한다고 명시적으로 얘기할 필요는 없습니다.</u>
+    - 여기서 중요한 것은 형태뿐입니다. 함수에 전달된 객체가 나열된 요구 조건을 충족하면, 허용됩니다.
+  - 타입 검사는 프로퍼티들의 순서를 요구하지 않는다.
+    - 그냥 프로퍼티가 있는지, 프로퍼티가 타입이 일치하는지만을 확인한다.
+
+  
+
+  
+
+  
+
+  
+
+
+
+
+
+
 
