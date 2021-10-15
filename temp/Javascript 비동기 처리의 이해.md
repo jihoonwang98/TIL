@@ -169,6 +169,8 @@ $.get('http://www.example.org', function(response) {
 
 - `Promise`는 비동기 연산을 감싸는 일종의 프록시 객체입니다.
 
+- 프로미스에 대한 자세한 설명은 [이곳](https://developer.mozilla.org/ko/docs/Web/JavaScript/Reference/Global_Objects/Promise)을 참조하세요.
+
 - **예제**
 
   ```javascript
@@ -189,7 +191,35 @@ $.get('http://www.example.org', function(response) {
   	.then(someNextTask);
   ```
 
-  
+  - Promise 덕분에 콜백을 중첩해서 호출하는 대신, Promise의 Chaining을 통해 좀 더 깔끔한 코드를 만들 수 있게 되었습니다.
+  - 에러 처리도 상당히 편리해진다.
+  - 그러나 <u>아직도 일련의 종속적인 작업들이 하나의 Promise Chain에 묶여있다는 점이 조금 불편하게 느껴진다.</u>
+
+
+
+### 다시 async - await
+
+- `async`, `await`은 ES8부터 자바스크립트에 포함되었고, `Promise`를 동기식 코드로 표현할 수 있게 해주는 문법이다.
+- `await`을 Promise 앞에 붙이게 되면 Promise가 성공했을 때의 결과값이 반환된다.
+
+```javascript
+async () => {
+  const response = await getData();
+  const result = await someTask(response);
+  const result_2 = await someNextTask(result);
+  const result_3 = await someNextNextTask(result_2);
+}
+```
+
+- 이제 비동기 작업을 감싼 Promise API는 감춰지고 온전히 동기적으로 이해할 수 있는 코드가 만들어진다.
+
+
+
+
+
+
+
+
 
 
 
