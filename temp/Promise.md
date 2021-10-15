@@ -1,12 +1,10 @@
 ##  Promise
 
-> https://developer.mozilla.org/ko/docs/Web/JavaScript/Guide/Using_promises
->
-> https://developer.mozilla.org/ko/docs/Web/JavaScript/Reference/Global_Objects/Promise
-
 
 
 ### Promise의 사용법
+
+> https://developer.mozilla.org/ko/docs/Web/JavaScript/Guide/Using_promises
 
 - Promise란?
 
@@ -143,7 +141,99 @@
 
 
 
+---
 
+### 표준 내장 객체 Promise
+
+> https://developer.mozilla.org/ko/docs/Web/JavaScript/Reference/Global_Objects/Promise
+
+
+
+- Promise란?
+  - `Promise` 객체는 보통 Promise가 생성되는 당시에 알 수 없는 값을 처리하기 위한 대리자 역할을 수행한다.
+  - 비동기 연산이 종료된 이후의 결과값이나 실패 이유를 처리하기 위한 처리기를 연결할 수 있도록 한다.
+  - Promise를 사용하면 비동기 메서드에서 마치 동기 메서드처럼 값을 반환할 수 있다.
+    - 다만 최종 결과를 반환하지는 않고, 대신 Promise를 반환해서 미래의 어떤 시점에 결과를 제공합니다.
+
+
+
+- Promise의 상태
+  - Promise는 다음 3가지 중 하나의 상태를 가진다.
+    - 대기 (pending): 이행 또는 거부되지 않은 초기 상태
+    - 이행 (fulfilled): 연산이 성공적으로 완료됨.
+    - 거부 (rejected): 연산이 실패함.
+  - 대기(pending) 중인 Promise는 
+    - 값과 함께 이행(fulfilled)할 수도,
+    - 어떤 이유(오류)로 인해 거부(rejected)될 수도 있다.
+  - 이행이나 거부될 때, Promise에 연결한 처리기는 그 Promise의 `then` 메서드에 의해 대기열에 오른다.
+    - 이미 이행했거나 거부된 Promise에 연결한 처리기도 호출하므로, 비동기 연산과 처리기 연결 사이에 경합 조건은 없다.
+
+![](https://mdn.mozillademos.org/files/8633/promises.png)
+
+
+
+
+
+```javascript
+Promise(executor: (resolve: (value: any) => void, reject: (reason?: any) => void) => void): Promise<any>
+```
+
+- 구조
+
+  - Promise는 executor 함수를 인자로 받는다.
+  - executor 함수는 resolve 함수랑 reject 함수 두 개를 인자로 받는다.
+
+- 인자 설명
+
+  - 보통 executor 함수가 처리하는데 시간이 오래 걸린다.
+    - 실제 실행하고 싶은 로직은 executor 함수의 body에 들어간다.
+  - executor 함수는
+
+  
+
+
+
+- **예제1**
+
+  ```javascript
+  function arriveAtSchool_tobe() {
+      return new Promise(function(resolve) {
+          setTimeout(function() {
+              console.log("학교에 도착했습니다.");
+              resolve();
+          }, 1000);
+      });
+  }
+  
+  /*
+  executor:
+  function(resolve) {
+  	setTimeout(function() {
+  		console.log('학교에 도착');
+  		resolve();
+  	}, 1000);
+  }
+  
+  // reject 인자가 생략된 경우
+  
+  
+  
+  */
+  ```
+
+  
+
+
+
+- Promise 메서드 정리
+  - [`Promise.all(iterable)`](https://developer.mozilla.org/ko/docs/Web/JavaScript/Reference/Global_Objects/Promise/all)
+  - [`Promise.race(iterable)`](https://developer.mozilla.org/ko/docs/Web/JavaScript/Reference/Global_Objects/Promise/race)
+  - [`Promise.reject()`](https://developer.mozilla.org/ko/docs/Web/JavaScript/Reference/Global_Objects/Promise/reject)
+  - [`Promise.resolve()`](https://developer.mozilla.org/ko/docs/Web/JavaScript/Reference/Global_Objects/Promise/resolve)
+  - [`Promise.prototype.then()`](https://developer.mozilla.org/ko/docs/Web/JavaScript/Reference/Global_Objects/Promise/then)
+    - `promise.then(onFulfilled, onRejected)`  
+    - Promise를 리턴하고 두 개의 콜백 함수를 인수로 받는다.
+    - 
 
 
 
