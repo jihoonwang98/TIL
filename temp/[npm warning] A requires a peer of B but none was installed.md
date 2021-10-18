@@ -14,7 +14,7 @@
 
   
 
-![](./img/스크린샷 2021-10-18 오전 8.31.09.png)
+![](./img/스크린샷%202021-10-18%20오전%208.31.09.png)
 
 - 뜻: `acv-keywords@3.5.2`가 `ajv@^6.9.1`의 peer를 필요로 하지만 설치되어 있지 않다. 그래서 내가 스스로 peer dependency들을 설치해야 한다(자동으로 설치해주지 않는다).
 - "A requires a peer of B but none was installed". Consider it as "A requires one of B's peers but that peer was not installed and we're not telling you which of B's peers you need."
