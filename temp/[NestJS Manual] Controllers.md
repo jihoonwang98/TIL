@@ -398,28 +398,192 @@
     ```
 
     - 위의 코드는 완전히 유효합니다.
-    - 또한 Nest 라우트 핸들러는 RxJS [관찰가능한 스트림](http://reactivex.io/rxjs/class/es6/Observable.js~Observable.html)를 반환할 수 있으므로 훨씬 더 강력합니다.
-    - Nest는 자동으로 아래의 소스를 구독하고 마지막으로 내보낸 값을 가져옵니다(스트림이 완료되면).
 
 
+
+- 또한 Nest 라우트 핸들러는 RxJS [관찰가능한 스트림](http://reactivex.io/rxjs/class/es6/Observable.js~Observable.html)를 반환할 수 있으므로 훨씬 더 강력합니다.
+
+  - Nest는 자동으로 아래의 소스를 구독하고 마지막으로 내보낸 값을 가져옵니다(스트림이 완료되면).
+
+  - 예제
+
+    ```typescript
+    @Get()
+    findAll(): Observable<any[]> {
+      return of([]);
+    }
+    ```
+
+> **역주**
+>
+> [Promise vs Observable](https://stackoverflow.com/questions/37364973/what-is-the-difference-between-promises-and-observables) 차이점 알아보기
 
 
 
 ### Request payloads
 
+- POST 라우트 핸들러의 이전 예제는 클라이언트 매개변수를 허용하지 않았습니다. 
+  - 여기에 `@Body()` 데코레이터를 추가하여 이 문제를 해결하겠습니다.
+- 그러나 먼저(TypeScript를 사용하는 경우) **DTO**(데이터 전송 개체) 스키마를 결정해야 합니다.
+  - DTO는 데이터가 네트워크를 통해 전송되는 방식을 정의하는 객체입니다. (Data Transfer Object)
+  - **TypeScript** 인터페이스를 사용하거나 간단한 클래스를 사용하여 DTO 스키마를 확인할 수 있습니다. 
+  - 흥미롭게도 여기서 **클래스**을 사용하는 것이 좋습니다.
+    - 왜? 클래스는 자바스크립트 ES6 표준의 일부이므로 컴파일된 자바스크립트에서 실제 엔티티로 유지됩니다. 
+    - 반면에 TypeScript 인터페이스는 트랜스 파일중에 제거되기 때문에 Nest는 런타임에 이를 참조할 수 없습니다. 
+    - **파이프**와 같은 기능은 런타임에 변수의 메타타입에 액세스할 수 있을 때 추가 가능성을 제공하기 때문에 중요합니다.
+
+
+
+- 예제
+
+  - `CreateCatDto` 클래스
+
+    ```typescript
+    export class CreateCatDto {
+      name: string;
+      age: number;
+      breed: string;
+    }
+    ```
+
+  - 기본 속성은 세 가지뿐이다. 그런 다음 `CatsController` 내부에서 새로 생성된 DTO를 사용할 수 있다.
+
+    ```typescript
+    @Post()
+    async create(@Body() createCatDto: CreateCatDto) {
+      return 'This action adds a new cat';
+    }
+    ```
+
+    
+
 ### Handling errors
+
+- [여기](https://docs.nestjs.kr/exception-filters)에 오류처리(예: 예외 작업)에 대한 별도의 장이 있습니다.
+
+
 
 ### Full resource sample
 
+- 다음은 사용 가능한 여러 데코레이터를 사용하여 기본 컨트롤러를 만드는 예제입니다. 
+
+- 이 컨트롤러는 내부 데이터에 액세스하고 조작하는 몇가지 방법을 제공합니다.
+
+- 예제
+
+  ```typescript
+  import { Controller, Get, Query, Post, Body, Put, Param, Delete } from '@nestjs/common';
+  import { CreateCatDto, UpdateCatDto, ListAllEntities } from './dto';
+  
+  @Controller('cats')
+  export class CatsController {
+    @Post()
+    create(@Body() createCatDto: CreateCatDto) {
+      return 'This action adds a new cat';
+    }
+  
+    @Get()
+    findAll(@Query() query: ListAllEntities) {
+      return `This action returns all cats (limit: ${query.limit} items)`;
+    }
+  
+    @Get(':id')
+    findOne(@Param('id') id: string) {
+      return `This action returns a #${id} cat`;
+    }
+  
+    @Put(':id')
+    update(@Param('id') id: string, @Body() updateCatDto: UpdateCatDto) {
+      return `This action updates a #${id} cat`;
+    }
+  
+    @Delete(':id')
+    remove(@Param('id') id: string) {
+      return `This action removes a #${id} cat`;
+    }
+  }
+  ```
+
+
+
+> **꿀팁**
+>
+> - Nest CLI는 **모든 상용구(boilerplate) 코드**를 자동으로 생성하는 생성기(스키메틱)를 제공하여 이 모든 작업을 피하도록 돕고, 개발자 경험을 훨씬 더 간단하게 만들 수 있습니다. 이 기능에 대한 자세한 내용은 [여기](https://docs.nestjs.kr/recipes/crud-generator)를 참조하세요.
+
+
+
 ### Getting up and running
+
+- 위 예제의 컨트롤러가 완전히 정의된 상태에서 Nest는 여전히 `CatsController`가 존재하는지 알지 못하므로 결과적으로 이 클래스의 인스턴스를 만들지 않습니다.
+
+- 컨트롤러는 항상 모듈에 속하므로 `@Module()` 데코레이터 내에 `controllers` 배열을 포함합니다. 
+
+- 루트 `AppModule`을 제외한 다른 모듈을 아직 정의하지 않았으므로 이를 사용하여 `CatsController`를 소개합니다.
+
+- 예제
+
+  ```typescript
+  import { Module } from '@nestjs/common';
+  import { CatsController } from './cats/cats.controller';
+  
+  @Module({
+    controllers: [CatsController],
+  })
+  export class AppModule {}
+  ```
+
+  - `@Module()` 데코레이터를 사용하여 모듈 클래스에 메타데이터를 첨부했으며 Nest는 이제 어떤 컨트롤러를 마운트해야 하는지 쉽게 반영할 수 있습니다.
+
+
 
 ### Library-specific approach
 
+- 지금까지 응답을 조작하는 Nest 표준방식에 대해 논의했습니다.
 
+- 응답을 조작하는 두번째 방법은 라이브러리별 [응답객체](https://expressjs.com/en/api.html#res)를 사용하는 것입니다. 
 
+- 특정 응답객체를 삽입하려면 `@Res()` 데코레이터를 사용해야 합니다. 
 
+- 차이점을 보여주기 위해 `CatsController`를 다음과 같이 다시 작성해 보겠습니다.
 
+- 예제
 
+  ```typescript
+  import { Controller, Get, Post, Res, HttpStatus } from '@nestjs/common';
+  import { Response } from 'express';
+  
+  @Controller('cats')
+  export class CatsController {
+    @Post()
+    create(@Res() res: Response) {
+      res.status(HttpStatus.CREATED).send();
+    }
+  
+    @Get()
+    findAll(@Res() res: Response) {
+       res.status(HttpStatus.OK).json([]);
+    }
+  }
+  ```
 
+  - 이 접근 방식이 작동하고 실제로 응답객체(헤더 조작, 라이브러리별 기능등)에 대한 전체제어를 제공함으로써 어떤 방식으로든 더 많은 유연성을 허용하지만 주의해서 사용해야 합니다.
 
+  - 일반적으로 접근방식은 훨씬 덜 명확하고 몇가지 **<u>단점</u>**이 있습니다. 
 
+    - 가장 큰 단점은 코드가 플랫폼에 종속되고(기본 라이브러리가 응답객체에 대해 다른 API를 가질 수 있기 때문에) 
+
+    - 테스트하기가 더 어렵다는 것입니다(응답객체를 모의 처리해야하는 등).
+
+    - 또한 위의 예에서 인터셉터 및 `@HttpCode()`/`@Header()` 데코레이터와 같은 Nest 표준 응답처리에 의존하는 Nest 기능과의 호환성이 손실됩니다.
+
+    - 이 문제를 해결하려면 다음과 같이 `passthrough` 옵션을 `true`로 설정할 수 있습니다.
+
+      ```typescript
+      @Get()
+      findAll(@Res({ passthrough: true }) res: Response) {
+        res.status(HttpStatus.OK);
+        return [];
+      }
+      ```
+
+      - 이제 네이티브 응답객체와 상호작용할 수 있지만(예: 특정조건에 따라 쿠키 또는 헤더설정) 나머지는 프레임워크에 맡깁니다.
