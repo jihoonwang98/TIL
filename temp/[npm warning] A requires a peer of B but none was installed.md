@@ -49,15 +49,29 @@
 
   - **<u>그래서 어떻게 해결하느냐?</u>**
 
-  - 설치하고 싶은 peer dependency마다 아래의 statement를 입력해주자
+  - ```shell
+    npm WARN {something} requires a peer of {other thing} but none is installed. You must install peer dependencies yourself.
+    ```
+
+    위처럼 떴으면 아래처럼 입력하면 된다.
 
     ```shell
-    npm install --save-dev xxxxx
+    npm install --save-dev "{other thing}"
+    ```
+
+  - 예제
+
+    ```shell
+    npm WARN ajv-keywords@3.5.2 requires a peer of ajv@^6.9.1 but none is installed. You must install peer dependencies yourself.
+    ```
+
+    ```shell
+    npm install --save-dev "ajv@^6.9.1"
     ```
 
     
 
-
+  
 
 
 
