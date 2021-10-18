@@ -169,6 +169,10 @@
             2
             ```
 
+> Middleware란? 
+>
+> 참조: [라봉이의 개발 블로그](https://psyhm.tistory.com/8)
+
 - `next()`는 프로미스
 
   - `next()`를 실행하면, 프로미스를 반환한다.
