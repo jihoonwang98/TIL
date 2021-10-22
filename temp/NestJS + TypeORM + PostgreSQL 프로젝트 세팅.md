@@ -2,6 +2,12 @@
 
 
 
+> [참고 velog](https://velog.io/@haileeyu21/NestJS-PostgreSQL%EA%B3%BC-%EC%97%B0%EB%8F%99-%EB%B0%8F-TypeORM-%EC%82%AC%EC%9A%A9%ED%95%B4%EC%84%9C-%ED%85%8C%EC%9D%B4%EB%B8%94-%EC%83%9D%EC%84%B1%ED%95%B4%EB%B3%B4%EA%B8%B0)
+
+
+
+
+
 ### 설치
 
 ```shell
