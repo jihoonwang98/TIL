@@ -25,17 +25,19 @@ yarn add @nestjs/typeorm typeorm pg
 - module을 import 할 때는 TypeORM 모듈의 설정값이 동적이기 때문에 TypeORM module을 forRoot 메서드를 이용해서 import 해준다.
 
 ```typescript
+import { TypeOrmModule } from '@nestjs/typeorm';
+
 @Module({
   imports: [
     TypeOrmModule.forRoot({
-      type: 'mysql',
+      type: 'postgres',
       host: 'localhost',
-      port: 3306,
-      username: 'root',
-      password: '1234',
-      database: 'test',
+      port: 5432,
+      username: 'mojo',
+      password: '',
+      database: 'prac',
       entities: [],
-      synchronize: true, // false가 안전함
+      synchronize: false, // false가 안전함
     }),
   ],
   controllers: [AppController],
