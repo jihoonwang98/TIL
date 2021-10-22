@@ -23,3 +23,41 @@ yarn add @nestjs/typeorm typeorm pg
 
 - typeorm에 연결하기 위해서는 App module에서 typeorm module을 import 해주면 된다.
 - module을 import 할 때는 TypeORM 모듈의 설정값이 동적이기 때문에 TypeORM module을 forRoot 메서드를 이용해서 import 해준다.
+
+```typescript
+@Module({
+  imports: [
+    TypeOrmModule.forRoot({
+      type: 'mysql',
+      host: 'localhost',
+      port: 3306,
+      username: 'root',
+      password: '1234',
+      database: 'test',
+      entities: [],
+      synchronize: true, // false가 안전함
+    }),
+  ],
+  controllers: [AppController],
+  providers: [AppService],
+})
+export class AppModule {}
+```
+
+- synchronize 기능을 키면 작성된 entity와 database간의 sync를 맞춰준다.
+
+  - 해당 기능을 사용하면 편할 수 있지만 원하지 않는 시점에 database 구조가 달라질 수 있으므로 주의해야 한다.
+
+  - 그래서 entity 설정과 sync를 맞춰주기 위해서 typeorm cli를 이용해서 원하는 시점에 sync를 맞추는게 좋다.
+
+    ```shell
+    // entity와 sync를 맞춰줌
+    yarn typeorm schema:sync
+    ```
+
+
+
+
+
+
+
