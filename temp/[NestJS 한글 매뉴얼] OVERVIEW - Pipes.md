@@ -20,6 +20,11 @@
   - Nest는 **<u>메소드가 호출되기 직전</u>**에 파이프를 삽입하고 파이프는 메소드로 향하는 인수를 수신하고 이에 대해 작동합니다. 
   - 모든 변환 또는 유효성 검사 작업은 해당 시간에 발생하며 그 후 라우트 핸들러가(잠재적으로) 변환된 인수와 함께 호출됩니다.
   - 즉, Pipe 작동 -> 라우트 핸들러 호출
+- Pipe 적용 가능 범위
+  - 매개변수 범위
+  - 메서드 범위
+  - 컨트롤러 범위
+  - 전역 범위
 
 
 
@@ -203,6 +208,384 @@
 
 
 ## Schema based validation
+
+- 유효성 검사 파이프를 좀 더 유용하게 만들어 보겠습니다. 
+
+- `CatsController`의 `create()` 메소드를 자세히 살펴보면 서비스 메소드를 실행하기 전에 게시물 본문 객체가 유효한지 확인하고 싶을 것입니다.
+
+  ```typescript
+  @Post()
+  async create(@Body() createCatDto: CreateCatDto) {
+    this.catsService.create(createCatDto);
+  }
+  ```
+
+- `createCatDto` 본문 매개변수에 초점을 맞춥니다. 타입은 `CreateCatDto`입니다.
+
+  ```typescript
+  // create-cat.dto.ts
+  export class CreateCatDto {
+    name: string;
+    age: number;
+    breed: string;
+  }
+  ```
+
+- create 메서드로 들어오는 모든 요청에 유효한 본문이 포함되어 있는지 확인하고 싶습니다. 
+
+  - 그래서 우리는 `createCatDto` 객체의 세 멤버를 검증해야 합니다. 
+    1. 라우트 핸들러 메소드내에서 이를 수행할 수 있지만 그렇게 하는 것은 **단일 책임 규칙**(SRP single responsibility rule)을 위반하므로 이상적이지 않습니다.
+    2. 또 다른 접근방식은 **유효성 검사기 클래스**를 만들고 여기에 작업을 위임하는 것입니다. 
+       - 이것은 우리가 각 메서드의 시작부분에서 이 유효성 검사기를 호출해야 한다는 것을 기억해야 한다는 단점이 있습니다.
+    3. 유효성 검사 미들웨어를 만드는 것은 어떻습니까?
+       - 이것은 작동할 수 있지만 불행히도 전체 애플리케이션의 모든 컨텍스트에서 사용할 수 있는 **일반 미들웨어**를 만드는 것은 불가능합니다.
+       - 이는 미들웨어가 호출될 핸들러 및 매개변수를 포함하여 **실행 컨텍스트**를 인식하지 못하기 때문입니다.
+    4. **<u>Pipe를 이용하자.</u>**
+       - Joi 라이브러리 이용
+       - class-validator 라이브러리 이용
+
+
+
+
+
+## Object schema validation
+
+- 깨끗하고 [DRY](https://en.wikipedia.org/wiki/Don't_repeat_yourself)한 방식으로 객체 유효성 검사를 수행하는데 사용할 수 있는 몇가지 방법이 있습니다.
+- 한가지 일반적인 접근 방식은 **스키마 기반** 유효성 검사를 사용하는 것입니다.
+  - [Joi](https://github.com/sideway/joi) 라이브러리를 사용하면 읽기 쉬운 API를 사용하여 간단한 방식으로 스키마를 만들 수 있습니다. 
+- Joi 기반 스키마를 사용하는 유효성 검사 파이프를 구축해 보겠습니다.
+
+
+
+- 필요한 패키지를 설치
+
+  ```shell
+  $ npm install --save joi
+  $ npm install --save-dev @types/joi
+  ```
+
+  
+
+- 예제
+
+  ```typescript
+  import { PipeTransform, Injectable, ArgumentMetadata, BadRequestException } from '@nestjs/common';
+  import { ObjectSchema } from 'joi';
+  
+  @Injectable()
+  export class JoiValidationPipe implements PipeTransform {
+    constructor(private schema: ObjectSchema) {}
+  
+    transform(value: any, metadata: ArgumentMetadata) {
+      const { error } = this.schema.validate(value);
+      if (error) {
+        throw new BadRequestException('Validation failed');
+      }
+      return value;
+    }
+  }
+  ```
+
+  - 위 코드 샘플에서는 스키마를 `constructor` 인수로 사용하는 간단한 클래스를 만듭니다.
+  - 그런 다음 제공된 스키마에 대해 들어오는 인수의 유효성을 검사하는 `schema.validate()` 메서드를 적용합니다.
+  - 앞서 언급했듯이 **유효성 검사 파이프**는 값을 변경하지 않고 반환하거나 예외를 던집니다(throw).
+  - 다음 섹션에서는 `@UsePipes()` 데코레이터를 사용하여 주어진 컨트롤러 메소드에 적절한 스키마를 제공하는 방법을 볼 수 있습니다. 
+  - 이렇게 하면 검증 파이프를 컨텍스트 전체에서 다시 사용할 수 있습니다.
+
+
+
+
+
+## Binding validation pipes
+
+- 앞서 `ParseIntPipe` 및 나머지 `Parse*` 파이프와 같은 변환 파이프를 바인딩하는 방법을 살펴 보았습니다.
+- 바인딩 유효성 검사 파이프도 매우 간단합니다.
+- 이 경우 메서드 호출 수준에서 파이프를 바인딩하려고 합니다. 현재 예제에서 `JoiValidationPipe`를 사용하려면 다음을 수행해야 합니다.
+  1. `JoiValidationPipe`의 인스턴스를 만듭니다.
+  2. 파이프의 클래스 생성자에 컨텍스트별 Joi 스키마를 전달합니다.
+  3. 파이프를 메서드에 바인딩
+
+- 예제
+
+  ```typescript
+  @Post()
+  @UsePipes(new JoiValidationPipe(createCatSchema))
+  async create(@Body() createCatDto: CreateCatDto) {
+    this.catsService.create(createCatDto);
+  }
+  ```
+
+  - 위와 같이 `@UsePipes()` 데코레이터를 사용합니다.
+
+
+
+
+
+## Class validator
+
+- 유효성 검사 기술의 대체 구현을 살펴 보겠습니다.
+
+- Nest는 [class-validator](https://github.com/typestack/class-validator) 라이브러리와 잘 작동합니다. 
+
+  - 이 강력한 라이브러리를 사용하면 **<u>데코레이터 기반</u>** 유효성 검사를 사용할 수 있습니다. 
+  - 데코레이터 기반 유효성 검사는 특히 처리된 속성의 `metatype`에 액세스할 수 있으므로 Nest의 **파이프** 기능과 결합할 때 매우 강력합니다. 
+
+- 시작하기 전에 필요한 패키지를 설치해야 합니다.
+
+  ```shell
+  $ npm i --save class-validator class-transformer
+  ```
+
+- 이것들이 설치되면 `CreateCatDto` 클래스에 데코레이터 몇개를 추가할 수 있습니다.
+
+  - 여기에서 이 기법의 중요한 이점을 볼 수 있습니다.
+
+  - `CreateCatDto` 클래스는 Post 본문 객체에 대한 단일 소스로 남아 있습니다 (별도의 유효성 검사 클래스를 만들 필요가 없음).
+
+    ```typescript
+    import { IsString, IsInt } from 'class-validator';
+    
+    export class CreateCatDto {
+      @IsString()
+      name: string;
+    
+      @IsInt()
+      age: number;
+    
+      @IsString()
+      breed: string;
+    }
+    ```
+
+>  **힌트** 
+>
+> 클래스 유효성 검사기 데코레이터에 대한 자세한 내용은 [여기](https://github.com/typestack/class-validator#usage)를 참조하세요.
+
+
+
+- 이제 이러한 주석을 사용하는 `ValidationPipe` 클래스를 만들 수 있습니다.
+
+```typescript
+import { PipeTransform, Injectable, ArgumentMetadata, BadRequestException } from '@nestjs/common';
+import { validate } from 'class-validator';
+import { plainToClass } from 'class-transformer';
+
+@Injectable()
+export class ValidationPipe implements PipeTransform<any> {
+  async transform(value: any, { metatype }: ArgumentMetadata) {
+    if (!metatype || !this.toValidate(metatype)) {
+      return value;
+    }
+    const object = plainToClass(metatype, value);
+    const errors = await validate(object);
+    if (errors.length > 0) {
+      throw new BadRequestException('Validation failed');
+    }
+    return value;
+  }
+
+  private toValidate(metatype: Function): boolean {
+    const types: Function[] = [String, Boolean, Number, Array, Object];
+    return !types.includes(metatype);
+  }
+}
+```
+
+- 이 코드를 살펴보겠습니다.
+- 먼저 `transform()` 메서드가 `async`로 표시되어 있습니다. 
+  - Nest가 동기 및 **비동기** 파이프를 모두 지원하기 때문에 가능합니다.
+  - 일부 `class-validator` 유효성 검사가 [비동기화될 수 있음](https://github.com/typestack/class-validator#custom-validation-classes)(Promise 활용)때문에 이 메서드를 `async`로 만듭니다.
+- 다음으로, 우리는 메타타입 필드 (`ArgumentMetadata`에서 이 멤버만 추출)를 `metatype` 매개변수로 추출하기 위해 디스트럭처링을 사용하고 있습니다.
+  - 이것은 전체 `ArgumentMetadata`를 가져온 다음 메타타입 변수를 할당하는 추가 명령문을 갖는 것에 대한 속기일 뿐입니다.
+- 다음으로 헬퍼 함수 `toValidate()`를 확인합니다. 
+  - 처리중인 현재 인수가 네이티브 자바스크립트 타입인 경우 유효성 검사 단계를 건너 뛰는 역할을 합니다(이러한 인수는 유효성 검사 데코레이터를 연결할 수 없으므로 유효성 검사 단계를 통해 실행할 이유가 없습니다).
+- 다음으로 클래스 변환기 함수 `plainToClass()`를 사용하여 일반 자바스크립트 인수 객체를 타입이 지정된 객체로 변환하여 유효성 검사를 적용할 수 있습니다. 
+  - 이 작업을 수행해야 하는 이유는 네트워크 요청에서 역직렬화될 때 들어오는 포스트(post) 본문 객체가 **아무 타입 정보도 가지고 있지 않기 때문입니다**(이것이 Express와 같은 기본 플랫폼이 작동하는 방식입니다). 
+  - 클래스 유효성 검사기는 이전에 DTO에 대해 정의한 유효성 검사 데코레이터를 사용해야 하므로 들어오는 본문을 단순한 바닐라 객체가 아닌 적절하게 장식된 객체로 처리하기 위해 이 변환을 수행해야 합니다.
+- 마지막으로 앞서 언급했듯이 이것은 **유효성 검사 파이프**이므로 변경되지 않은 값을 반환하거나 예외를 던집니다(throw).
+
+
+
+> **알림**
+>
+> - 위에서 우리는 [class-transformer](https://github.com/typestack/class-transformer) 라이브러리를 사용했습니다. 
+> - **class-validator** 라이브러리와 동일한 작성자가 만들었으며 결과적으로 서로 잘 어울립니다.
+
+
+
+- 마지막 단계는 `ValidationPipe`를 바인딩하는 것입니다.
+
+  - 파이프는 매개변수 범위, 메서드 범위, 컨트롤러 범위 또는 전역 범위일 수 있습니다. 
+
+- 앞서 Joi 기반 유효성 검사 파이프를 사용하여 메서드 수준에서 파이프를 바인딩하는 예를 보았습니다. 
+
+- 아래 예제에서는 파이프 인스턴스를 라우트 핸들러 `@Body()` 데코레이터에 바인딩하여 파이프가 포스트(post) 본문의 유효성을 검사하도록 호출합니다.
+
+  ```typescript
+  // cats.controller.ts
+  @Post()
+  async create(
+    @Body(new ValidationPipe()) createCatDto: CreateCatDto,
+  ) {
+    this.catsService.create(createCatDto);
+  }
+  ```
+
+  - 매개변수 범위 파이프는 유효성 검증 로직이 지정된 매개변수 하나만 관련될 때 유용합니다.
+
+
+
+
+
+## Global scoped pipes
+
+- `ValidationPipe`는 가능한 한 일반적으로 생성되었으므로 전체 애플리케이션의 모든 라우트 핸들러에 적용되도록 **전역 범위**(global-scoped) 파이프로 설정하여 완전한 유틸리티임을 실현할 수 있습니다.
+
+  ```typescript
+  // main.ts
+  async function bootstrap() {
+    const app = await NestFactory.create(AppModule);
+    app.useGlobalPipes(new ValidationPipe());
+    await app.listen(3000);
+  }
+  bootstrap();
+  ```
+
+> **알림**
+>
+> - [하이브리드 앱](https://docs.nestjs.kr/faq/hybrid-application)의 경우 `useGlobalPipes()` 메서드는 게이트웨이 및 마이크로서비스에 대한 파이프를 설정하지 않습니다. 
+> - "표준"(비 하이브리드) 마이크로서비스 앱의 경우 `useGlobalPipes()`는 파이프를 전역으로 마운트합니다.
+
+
+
+- 전역 파이프는 모든 컨트롤러 및 모든 라우트 핸들러에 대해 애플리케이션에서 사용됩니다.
+
+- 의존성 주입과 관련하여 모듈 외부에서 등록된 전역 파이프(위의 예에서와 같이 `useGlobalPipes()` 사용)는 바인딩이 모듈 컨텍스트 외부에서 수행되었으므로 종속성을 주입할 수 없습니다. 
+
+  - 이 문제를 해결하기 위해 다음 구성을 사용하여 **모든 모듈에서 직접** 전역 파이프를 설정할 수 있습니다.
+
+    ```typescript
+    // app.module.ts
+    import { Module } from '@nestjs/common';
+    import { APP_PIPE } from '@nestjs/core';
+    
+    @Module({
+      providers: [
+        {
+          provide: APP_PIPE,
+          useClass: ValidationPipe,
+        },
+      ],
+    })
+    export class AppModule {}
+    ```
+
+> **힌트**
+>
+> - 이 접근방식을 사용하여 파이프에 대한 종속성 주입을 수행할 때 이 구성이 사용되는 모듈에 관계없이 파이프는 실제로 전역이라는 점에 유의하십시오. 
+> - 어디에서 해야 합니까? 
+>   - 파이프(위의 예에서는 `ValidationPipe`)가 정의된 모듈을 선택합니다. 또한 `useClass`가 커스텀 프로바이더 등록을 처리하는 유일한 방법은 아닙니다. [여기](https://docs.nestjs.kr/fundamentals/custom-providers)에서 자세히 알아보세요.
+
+
+
+## The build-in ValidationPipe
+
+- 참고로 `ValidationPipe`는 Nest에서 즉시 제공되므로 일반 유효성 검사 파이프를 직접 빌드할 필요가 없습니다. 
+- 빌트인 `ValidationPipe`는 이 장에서 빌드한 샘플보다 더 많은 옵션을 제공합니다.
+- 이 샘플은 커스텀 빌드 파이프의 메커니즘을 설명하기 위해 기본으로 유지되었습니다.
+- 많은 예제와 함께 자세한 내용은 [여기](https://docs.nestjs.kr/techniques/validation)에서 찾을 수 있습니다.
+
+
+
+
+
+## Transformation use case
+
+- 커스텀 파이프의 유일한 사용 사례는 유효성 검사가 아닙니다. 
+
+  - 이 장의 시작부분에서 파이프가 입력 데이터를 원하는 형식으로 **변환**할 수도 있다고 언급했습니다. 
+  - 이는 `transform` 함수에서 반환된 값이 인수의 이전값을 완전히 덮어쓰기 때문에 가능합니다.
+
+- 이것이 언제 유용합니까? 
+
+  - 때때로 클라이언트에서 전달된 데이터는 라우트 핸들러 메소드에 의해 적절하게 처리되기 전에 문자열을 정수로 변환하는 것과 같이 약간의 변경이 필요하다는 점을 고려하십시오. 
+  - 또한 일부 필수 데이터 필드가 누락되었을 수 있으며 기본값을 적용하려고합니다. **변환 파이프**는 클라이언트 요청과 요청 핸들러 사이에 처리 기능을 삽입하여 이러한 기능을 수행할 수 있습니다.
+
+- 예제
+
+  ```typescript
+  // parse-int.pipe.ts
+  import { PipeTransform, Injectable, ArgumentMetadata, BadRequestException } from '@nestjs/common';
+  
+  @Injectable()
+  export class ParseIntPipe implements PipeTransform<string, number> {
+    transform(value: string, metadata: ArgumentMetadata): number {
+      const val = parseInt(value, 10);
+      if (isNaN(val)) {
+        throw new BadRequestException('Validation failed');
+      }
+      return val;
+    }
+  }
+  ```
+
+  - 위 예제는 문자열을 정수값으로 파싱하는 간단한 `ParseIntPipe`입니다.(위에서 언급했듯이 Nest에는 더 정교한 내장 `ParseIntPipe`가 있습니다. 이를 커스텀 변환 파이프의 간단한 예로 포함합니다).
+  - 그런 다음 이 파이프를 아래와 같이 선택한 매개변수에 바인딩할 수 있습니다.
+
+  ```typescript
+  @Get(':id')
+  async findOne(@Param('id', new ParseIntPipe()) id) {
+    return this.catsService.findOne(id);
+  }
+  ```
+
+- 예제
+
+  - 또 다른 유용한 변환사례는 요청에 제공된 ID를 사용하여 데이터베이스에서 **기존 사용자** 항목을 선택하는 것입니다.
+
+    ```typescript
+    @Get(':id')
+    findOne(@Param('id', UserByIdPipe) userEntity: UserEntity) {
+      return userEntity;
+    }
+    ```
+
+    - 이 파이프의 구현은 독자에게 맡기지만 다른 모든 변환 파이프와 마찬가지로 입력값(`id`)을 받고 출력값(`UserEntity` 객체)을 반환합니다.
+    - 이렇게하면 핸들러에서 공통 파이프로 상용구 코드를 추상화하여 코드를 더 선언적이고 [DRY](https://en.wikipedia.org/wiki/Don't_repeat_yourself)하게 만들 수 있습니다.
+
+
+
+## Providing defaults
+
+- `Parse*` 파이프는 매개변수 값이 정의될 것으로 예상합니다.
+
+- `null` 또는 `undefined` 값을 받으면 예외가 발생합니다. 
+
+- 엔드포인트가 누락된 쿼리 문자열 매개변수 값을 처리할 수 있도록하려면 `Parse*` 파이프가 이러한 값에 대해 작동하기 전에 삽입할 기본값을 제공해야합니다.
+
+- `DefaultValuePipe`는 그 목적에 부합합니다. 
+
+- 아래와 같이 관련 `Parse*` 파이프 앞에 `@Query()` 데코레이터에서 `DefaultValuePipe`를 인스턴스화하면됩니다.
+
+  ```typescript
+  @Get()
+  async findAll(
+    @Query('activeOnly', new DefaultValuePipe(false), ParseBoolPipe) activeOnly: boolean,
+    @Query('page', new DefaultValuePipe(0), ParseIntPipe) page: number,
+  ) {
+    return this.catsService.findAll({ activeOnly, page });
+  }
+  ```
+
+  
+
+
+
+
+
+
+
+
 
 
 
