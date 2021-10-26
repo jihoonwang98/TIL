@@ -1,4 +1,4 @@
-## TypeScript 클래스
+## [TypeScript 핸드북] 클래스
 
 > https://typescript-kr.github.io/pages/classes.html
 
