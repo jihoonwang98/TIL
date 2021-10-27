@@ -98,10 +98,6 @@
 
     
 
-
-
-
-
 - 엔티티에 대응되는 테이블 이름
   - `@Entity("my_users")`: 테이블 이름이 `my_users`가 된다.
   - 또는 모든 DB 테이블에 prefix를 붙여주고 싶다면, connection options에 `entityPrefix`를 추가해줄 수도 있다.
@@ -109,7 +105,8 @@
 
 
 - 주의
-  - Entity
+  - 원문: When using an entity constructor its arguments **must be optional**. Since ORM creates instances of entity classes when loading from the database, therefore it is not aware of your constructor arguments.
+  - 엔티티 클래스의 생성자를 이용할 때 arguments들은 optional이어야만 한다. 왜냐하면 ORM이 DB로부터 entity를 불러올 때 해당 entity의 인스턴스를 만들기 때문에, 생성자 인수를 인식하지 못하게 된다. (생성자 인수에 undefined가 들어감).
     - [Entity로 테이블 만들기 - 호돌록](https://log.hodol.dev/typescript/typeorm/entity)
     - 
 
