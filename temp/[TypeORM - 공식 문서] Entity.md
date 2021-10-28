@@ -107,14 +107,31 @@
 - 주의
   - 원문: When using an entity constructor its arguments **must be optional**. Since ORM creates instances of entity classes when loading from the database, therefore it is not aware of your constructor arguments.
   - 엔티티 클래스의 생성자를 이용할 때 arguments들은 optional이어야만 한다. 왜냐하면 ORM이 DB로부터 entity를 불러올 때 해당 entity의 인스턴스를 만들기 때문에, 생성자 인수를 인식하지 못하게 된다. (생성자 인수에 undefined가 들어감).
-    - [Entity로 테이블 만들기 - 호돌록](https://log.hodol.dev/typescript/typeorm/entity)
-    - 
+    - 참고: [Entity로 테이블 만들기 - 호돌록](https://log.hodol.dev/typescript/typeorm/entity)
+  - Learn more about parameters `@Entity` in [Decorators reference](https://typeorm.io/#/decorator-reference/).
 
 
 
 
 
+## Entity Columns
 
+- DB 테이블이 컬럼으로 구성되기 때문에 엔티티 역시 컬럼으로 구성되어야 한다.
+  - `@Column`으로 표시한 엔티티 클래스 프로퍼티들은 DB 테이블 컬럼으로 매핑된다.
+
+
+
+### Primary Columns
+
+### Special Columns
+
+### Spatial Columns
+
+
+
+
+
+## C
 
 
 
