@@ -880,7 +880,7 @@
 
   - 메모리 구조는 아래와 같이 나타낼 수 있습니다.
 
-    ![image-20211030165650531](/Users/mojo/Library/Application Support/typora-user-images/image-20211030165650531.png)
+    ![image-20211030165650531](./img/image-20211030165650531.png)
 
     - 지금은 모든 객체가 도달 가능한 상태입니다. 이제 참조 두 개를 지워보겠습니다.
 
@@ -891,7 +891,7 @@
   delete family.mother.husband;
   ```
 
-  ![image-20211030165739143](/Users/mojo/Library/Application Support/typora-user-images/image-20211030165739143.png)
+  ![image-20211030165739143](./img/image-20211030165739143.png)
 
   - 삭제한 두 개의 참조 중 하나만 지웠다면, 모든 객체가 여전히 도달 가능한 상태였을 겁니다.
 
@@ -899,7 +899,7 @@
 
     
 
-  ![image-20211030165821746](/Users/mojo/Library/Application Support/typora-user-images/image-20211030165821746.png)
+  ![image-20211030165821746](./img/image-20211030165821746.png)
 
   - 외부로 나가는 참조는 도달 가능한 상태에 영향을 주지 않습니다. 
 
@@ -913,7 +913,7 @@
 
   - 가비지 컬렉션 후 메모리 구조는 아래와 같습니다.
 
-  ![image-20211030165951242](/Users/mojo/Library/Application Support/typora-user-images/image-20211030165951242.png)
+  ![image-20211030165951242](./img/image-20211030165951242.png)
 
 
 
@@ -929,7 +929,7 @@
 
 - 이제 메모리 내부 상태는 다음과 같아집니다.
 
-  ![image-20211030170039315](/Users/mojo/Library/Application Support/typora-user-images/image-20211030170039315.png)
+  ![image-20211030170039315](./img/image-20211030170039315.png)
 
   - 도달할 수 없는 섬 예제는 도달 가능성이라는 개념이 얼마나 중요한지 보여줍니다.
   - John과 Ann은 여전히 서로를 참조하고 있고, 두 객체 모두 외부에서 들어오는 참조를 갖고 있지만, 이것만으로는 충분하지 않다는걸 보여주죠.
@@ -952,7 +952,7 @@
 
 - 다음과 같은 객체 구조가 있다고 해봅시다.
 
-  ![image-20211030170238419](/Users/mojo/Library/Application Support/typora-user-images/image-20211030170238419.png)
+  ![image-20211030170238419](./img/image-20211030170238419.png)
 
   - 오른편에 '도달할 수 없는 섬’이 보이네요. 
 
@@ -960,19 +960,19 @@
 
   - 첫 번째 단계에선 루트를 mark 합니다.
 
-    ![image-20211030170303699](/Users/mojo/Library/Application Support/typora-user-images/image-20211030170303699.png)
+    ![image-20211030170303699](./img/image-20211030170303699.png)
 
   - 이후 루트가 참조하고 있는 것들을 mark 합니다.
 
-    ![image-20211030170318277](/Users/mojo/Library/Application Support/typora-user-images/image-20211030170318277.png)
+    ![image-20211030170318277](./img/image-20211030170318277.png)
 
   - 도달 가능한 모든 객체를 방문할 때까지, mark 한 객체가 참조하는 객체를 계속해서 mark 합니다.
 
-    ![image-20211030170331205](/Users/mojo/Library/Application Support/typora-user-images/image-20211030170331205.png)
+    ![image-20211030170331205](./img/image-20211030170331205.png)
 
   - 방문할 수 없었던 객체를 메모리에서 삭제합니다.
 
-    ![image-20211030170344511](/Users/mojo/Library/Application Support/typora-user-images/image-20211030170344511.png)
+    ![image-20211030170344511](./img/image-20211030170344511.png)
 
 
 
