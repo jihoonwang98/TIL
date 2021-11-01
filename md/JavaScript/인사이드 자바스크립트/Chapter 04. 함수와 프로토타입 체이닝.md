@@ -391,7 +391,7 @@
     console.dir(add);
     ```
 
-    ![](https://lh4.googleusercontent.com/eXxDUAej3piITOgbpkr2soRzTiAGnyicRcMiP6eYAko7bKAOawWpkyXW_cvMjySyUtDbYuxS3GNaSSLBS8Iuxg4V3gacO7DyMHhz0yb0uicLS5rmxdhBY6a8kdMv3SKaq2o9CKNv=s0)
+    ![](./img/13.png)
 
     - ECMA5 스크립트 명세서에는 모든 함수가 **length**와 **prototype** 프로퍼티를 가져야 한다고 기술하고 있다.
     - name 프로퍼티는 함수의 이름을 나타낸다.
@@ -462,7 +462,7 @@
 
   - prototype 프로퍼티는 함수가 생성될 때 만들어지며, 다음 그림과 같이 단지 **constructor 프로퍼티** 하나만 있는 객체를 가리킨다.
 
-    ![](https://docs.google.com/drawings/d/sFSqbC1FLg6YYHl23CS_Y8g/image?parent=e/2PACX-1vQiuXMoUJloXB41go11kimhAxCGB0Jhf5sdczvyrPIjH533basHPtLBcGPi59BcshFWUj6e55GqbGOO&rev=81&drawingRevisionAccessToken=HYRQAKOWACbZOg&h=127&w=514&ac=1)
+    ![](./img/14.png)
 
   - 그리고 prototype 프로퍼티가 가리키는 프로토타입 객체의 유일한 constructor 프로퍼티는 자신과 연결된 함수를 가리킨다. 
 
@@ -498,7 +498,7 @@
 
   - 콜백 함수의 예시: 자바스크립트에서의 이벤트 핸들러 처리
 
-    ![](https://docs.google.com/drawings/d/src8CRnoI22eHBdRF60E_XQ/image?parent=e/2PACX-1vQiuXMoUJloXB41go11kimhAxCGB0Jhf5sdczvyrPIjH533basHPtLBcGPi59BcshFWUj6e55GqbGOO&rev=159&drawingRevisionAccessToken=vODD0sT8ggw5YQ&h=398&w=492&ac=1)
+    ![](./img/15.png)
 
   - **[예제 4-15]** window.onload 이벤트 핸들러 예제 코드
 
@@ -953,7 +953,7 @@
 
     
 
-    ![](https://docs.google.com/drawings/d/sG71Wead17-Ocmaha3Ae-xA/image?parent=e/2PACX-1vQiuXMoUJloXB41go11kimhAxCGB0Jhf5sdczvyrPIjH533basHPtLBcGPi59BcshFWUj6e55GqbGOO&rev=433&drawingRevisionAccessToken=hT2tGTiBEAgHow&h=338&w=601&ac=1)
+    ![](./img/16.png)
 
     
 
@@ -1007,7 +1007,7 @@
 
     - 객체 리터럴 방식으로 생성한 객체 출력결과
 
-      ![](https://lh6.googleusercontent.com/78qfH-AqXKojtamliSAYEfp_coklw6MWn_di69iO7uSdj3PBikRHAEKLIsGf9dP4UeNTggCjmuQYjzVhtH3LulBcjPmIIuL5bmMpYWRx-IR0IaNc0qnxc6XeLgKXMRa9rcrQNc6D=s0)
+      ![](./img/17.png)
 
       - 객체 리터럴 방식의 경우 자신의 프로토타입 객체가 **Object (Object.prototype)**
 
@@ -1015,7 +1015,7 @@
 
     - 생성자 함수 방식으로 생성한 객체 출력결과
 
-      ![](https://lh3.googleusercontent.com/ZXR9WJIvvSij0Djy_5FbTmcIA7XaiygAMw_MqUeqCisf7PgUfem85WhQLwwvMl4V78Qp6rD2IxsL_KP2eGf6e_UZP6V-YROIFtzDi5R1OJGK8Az2B9EsSDF9rd6LfDTRJSs0g4nf=s0)
+      ![](./img/18.png)
 
       - 생성자 함수 방식의 경우 자신의 프로토타입 객체가 **Person (Person.prototype)**
 
@@ -1331,7 +1331,7 @@
       console.dir(foo);
       ```
 
-      ![](https://docs.google.com/drawings/d/sfHeiGkkABHbfJ2sJEeLKbQ/image?parent=e/2PACX-1vQiuXMoUJloXB41go11kimhAxCGB0Jhf5sdczvyrPIjH533basHPtLBcGPi59BcshFWUj6e55GqbGOO&rev=270&drawingRevisionAccessToken=t9jRkYrMsTrEkA&h=408&w=601&ac=1)
+      ![](./img/19.png)
 
       - Person() 생성자 함수는 prototype 프로퍼티로 자신과 링크된 **프로토타입 객체 Person.prototype**를 가리킨다.
 
@@ -1383,7 +1383,7 @@
     
       **[객체 리터럴 방식에서의 객체와 프로토타입 객체의 관계]**
     
-      ![](https://docs.google.com/drawings/d/s5I4skzWU7m9n01grhjsviA/image?parent=e/2PACX-1vQiuXMoUJloXB41go11kimhAxCGB0Jhf5sdczvyrPIjH533basHPtLBcGPi59BcshFWUj6e55GqbGOO&rev=189&drawingRevisionAccessToken=RkUbPjMUryAnDQ&h=463&w=601&ac=1)
+      ![](./img/20.png)
     
   - 프로토타입 체이닝
   
@@ -1427,7 +1427,7 @@
 
       **[생성자 함수 방식에서의 객체와 프로토타입 객체의 관계]**
 
-      ![](https://docs.google.com/drawings/d/sMvJdV8lSjSJjjJ90DDJ6Sw/image?parent=e/2PACX-1vQiuXMoUJloXB41go11kimhAxCGB0Jhf5sdczvyrPIjH533basHPtLBcGPi59BcshFWUj6e55GqbGOO&rev=208&drawingRevisionAccessToken=NkSkekqOJy9U7w&h=510&w=601&ac=1)
+      ![](./img/21.png)
 
 
 
@@ -1463,7 +1463,7 @@
       console.dir(String.prototype);
       ```
 
-      ![](https://docs.google.com/drawings/d/e/2PACX-1vSqVv-tANRbLyiXh3cibAviKfCx-w11fGpZ9edzhty7sbuhaycbuG7msALbRJbjUEsJ7ZN8E-TY7O2u/pub?w=960&h=720)
+      ![](./img/22.png)
 
 - 프로토타입도 자바스크립트 객체다
 
@@ -1534,7 +1534,7 @@
       - Person.prototype.getName() 메서드와 같이 프로토타입 체이닝이 아니라, 바로 Person.prototype 객체에 접근해서 getName() 메서드를 호출하면 어떻게 될까? 
         - 이때는 getName() 메서드를 호출한 객체가 Person.prototype이므로 this도 여기에 바인딩된다. 그리고 Person.prototype 객체에 name 프로퍼티를 동적으로 추가하고 'person'을 저장했으므로 this.name은 'person'이 출력된다.
 
-      ![](https://docs.google.com/drawings/d/e/2PACX-1vTTixoDwjjqFXSE3jajkgsimACDEJuh9DtwF_EN-fSJHkbmoxRZ51-_squOpw6Cdha8BMDfbnxxs5DP/pub?w=960&h=720)
+      ![](./img/23.png)
 
 - 디폴트 프로토타입은 다른 객체로 변경이 가능하다
 
@@ -1577,7 +1577,7 @@
     console.log(bar.constructor);  // Object()
     ```
 
-    ![](https://docs.google.com/drawings/d/e/2PACX-1vSBMPYhP94myL28HLoZIO8R1EVZp1mBjtSzFUSShnMfknqaYs2MSvxsxaNgpawuZaY6GdOGCmVZEYJ3/pub?w=1072&h=737)
+    ![](./img/24.png)
 
     - Person() 함수를 생성할 때 디폴트로 같이 생성되는 Person.prototype 객체는 자신과 연결된 Person() 생성자 함수를 가리키는 constructor 프로퍼티만을 가진다. 때문에 Person.prototype.constructor는 Person() 생성자 함수를 가리킨다.
 
@@ -1619,7 +1619,7 @@
     console.log(bar.country); // Korea
     ```
 
-    ![](https://docs.google.com/drawings/d/e/2PACX-1vQAECB3Karn6TIFGgLGXhnB034GwDaRklFbl9vLwCth1H1IWyga7s1MB5gYfz_X6KoQKKIIww9wTLZE/pub?w=960&h=720)
+    ![](./img/25.png)
 
     - foo와 bar 객체는 둘 다 Person.prototype 객체를 프로토타입으로 가진다.
     - 처음에는 foo, bar 객체 둘 다 country 프로퍼티가 없으므로 프로토타입 체이닝이 이뤄지면서 Person.prototype의 country 프로퍼티인 'Korea'가 출력된다.

@@ -44,7 +44,7 @@
 
   - 크게 기본 타입(Primitive type)과 참조 타입(Reference Type)
 
-  ![](https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=http%3A%2F%2Fcfile2.uf.tistory.com%2Fimage%2F245AF44657DF4E0125050A)
+  ![](./img/1.png)
 
   
 
@@ -437,7 +437,7 @@
   50
   ```
 
-  - ![](https://docs.google.com/drawings/d/sXYzmy7cRgHMvhcMJs5mmlg/image?parent=e/2PACX-1vQiuXMoUJloXB41go11kimhAxCGB0Jhf5sdczvyrPIjH533basHPtLBcGPi59BcshFWUj6e55GqbGOO&rev=31&drawingRevisionAccessToken=3Dj4qKeY8MtI8Q&h=165&w=500&ac=1)
+  - ![](./img/2.png)
 
 
 
@@ -538,7 +538,7 @@
 
     - (2): foo 객체를 출력해보자.
 
-      ![](https://lh6.googleusercontent.com/CG2nQsdAn_mKAHCLhoWlnRU6Qq5P6ml4aw8lcJ9mSUojqWQDUCzZJ8T218iJ-L4vrlMV5D9_CU2Hh1EK26LWKr2dWLVYOgOodIBW7SuWFkiIZXIpd-6lXVbrJF5NL-AsxEnNaWN5=s0)
+      ![](./img/3.png)
 
   
 
@@ -548,7 +548,7 @@
 
     - 위의 예제 3-12와 같이 객체 리터럴 방식으로 생성된 객체의 경우 **Object.prototype 객체**가 프로토타입 객체가 된다는 것만 기억하고 넘어가자.
 
-      ![](https://docs.google.com/drawings/d/sErN42DsAb65VmZgfH788iQ/image?parent=e/2PACX-1vQiuXMoUJloXB41go11kimhAxCGB0Jhf5sdczvyrPIjH533basHPtLBcGPi59BcshFWUj6e55GqbGOO&rev=164&drawingRevisionAccessToken=OcpLCMqrnwHrNQ&h=382&w=575&ac=1)
+      ![](./img/4.png)
 
   - 또한, 객체를 생성할 때 결정된 프로토타입 객체는 임의의 다른 객체로 변경하는 것도 가능하다.
 
@@ -670,17 +670,17 @@
     undefined
     ```
 
-    - ![](https://docs.google.com/drawings/d/s8zTxA1nNscr8GRW6mZcdCQ/image?parent=e/2PACX-1vQiuXMoUJloXB41go11kimhAxCGB0Jhf5sdczvyrPIjH533basHPtLBcGPi59BcshFWUj6e55GqbGOO&rev=28&drawingRevisionAccessToken=90OQvlTnBqqy8A&h=74&w=225&ac=1)
+    - ![](./img/5.png)
 
       
 
     
 
-    - ![](https://docs.google.com/drawings/d/suF0gO2uqDCMVpz0xo4qP7g/image?parent=e/2PACX-1vQiuXMoUJloXB41go11kimhAxCGB0Jhf5sdczvyrPIjH533basHPtLBcGPi59BcshFWUj6e55GqbGOO&rev=141&drawingRevisionAccessToken=VLrmhX6rTHiNNg&h=373&w=427&ac=1)
+    - ![](./img/6.png)
 
       
 
-    - ![](https://docs.google.com/drawings/d/svT4c277GALbY7upW1S9GYQ/image?parent=e/2PACX-1vQiuXMoUJloXB41go11kimhAxCGB0Jhf5sdczvyrPIjH533basHPtLBcGPi59BcshFWUj6e55GqbGOO&rev=1&drawingRevisionAccessToken=OiMkgXKUSbks6A&h=422&w=427&ac=1)
+    - ![](./img/7.png)
 
     
 
@@ -716,19 +716,19 @@
     [ 'zero', 'one', 'two', 'three', <1 empty item>, 'four' ]
     ```
 
-    - ![](https://docs.google.com/drawings/d/s2XrSr7LIGY7Mz7r-lJtt7A/image?parent=e/2PACX-1vQiuXMoUJloXB41go11kimhAxCGB0Jhf5sdczvyrPIjH533basHPtLBcGPi59BcshFWUj6e55GqbGOO&rev=77&drawingRevisionAccessToken=9iMtPQ0tcYKcPQ&h=205&w=427&ac=1)
+    - ![](./img/8.png)
 
       
 
-    - ![](https://docs.google.com/drawings/d/syA630ERChgmAS1QBsInNJA/image?parent=e/2PACX-1vQiuXMoUJloXB41go11kimhAxCGB0Jhf5sdczvyrPIjH533basHPtLBcGPi59BcshFWUj6e55GqbGOO&rev=58&drawingRevisionAccessToken=62OTdTqEx1ykUA&h=179&w=427&ac=1)
+    - ![](./img/9.png)
 
       
 
-    - ![](https://docs.google.com/drawings/d/sP-MDp4Yqm2_AGacbj28GiQ/image?parent=e/2PACX-1vQiuXMoUJloXB41go11kimhAxCGB0Jhf5sdczvyrPIjH533basHPtLBcGPi59BcshFWUj6e55GqbGOO&rev=41&drawingRevisionAccessToken=R0yXUydmf_Vk3w&h=173&w=427&ac=1)
+    - ![](./img/10.png)
 
       
 
-    - ![](https://docs.google.com/drawings/d/s10WYmLyYrK5IGMVgKiV1mA/image?parent=e/2PACX-1vQiuXMoUJloXB41go11kimhAxCGB0Jhf5sdczvyrPIjH533basHPtLBcGPi59BcshFWUj6e55GqbGOO&rev=52&drawingRevisionAccessToken=SuAjL3m_CuW1WQ&h=165&w=427&ac=1)
+    - ![](./img/11.png)
 
 
 
@@ -790,7 +790,7 @@
 
       
 
-      ![](https://docs.google.com/drawings/d/sLncV0X96cHfLFxKJEEuUfA/image?parent=e/2PACX-1vQiuXMoUJloXB41go11kimhAxCGB0Jhf5sdczvyrPIjH533basHPtLBcGPi59BcshFWUj6e55GqbGOO&rev=96&drawingRevisionAccessToken=spH9orLDBgxY1A&h=369&w=553&ac=1)
+      ![](./img/12.png)
 
     
 

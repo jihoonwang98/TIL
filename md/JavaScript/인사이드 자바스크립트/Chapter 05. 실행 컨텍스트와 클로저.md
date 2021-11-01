@@ -59,7 +59,7 @@
     ExContext2();
     ```
 
-    ![](https://docs.google.com/drawings/d/sMU4uDNFxdjbtJWV46giuNw/image?parent=e/2PACX-1vQiuXMoUJloXB41go11kimhAxCGB0Jhf5sdczvyrPIjH533basHPtLBcGPi59BcshFWUj6e55GqbGOO&rev=200&drawingRevisionAccessToken=uvSbYVZ9qnLsFA&h=308&w=601&ac=1)
+    ![](./img/26.png)
 
     
 
@@ -121,7 +121,7 @@
 
   
 
-  ![](https://docs.google.com/drawings/d/sPPQENm8MD-oABbVBxQdIaA/image?parent=e/2PACX-1vQiuXMoUJloXB41go11kimhAxCGB0Jhf5sdczvyrPIjH533basHPtLBcGPi59BcshFWUj6e55GqbGOO&rev=80&drawingRevisionAccessToken=6zmOB4TNPusXnw&h=228&w=335&ac=1)
+  ![](./img/27.png)
 
   
 
@@ -135,7 +135,7 @@
 
     
 
-    ![](https://docs.google.com/drawings/d/sGrBRLNMWgi6Hg3sCAJIeCw/image?parent=e/2PACX-1vQiuXMoUJloXB41go11kimhAxCGB0Jhf5sdczvyrPIjH533basHPtLBcGPi59BcshFWUj6e55GqbGOO&rev=141&drawingRevisionAccessToken=hqmY7tMP01o81A&h=288&w=335&ac=1)
+    ![](./img/28.png)
 
     
 
@@ -156,7 +156,7 @@
 
   
 
-  ![](https://docs.google.com/drawings/d/so5RMrBUkwBPAu9_pWVNWug/image?parent=e/2PACX-1vQiuXMoUJloXB41go11kimhAxCGB0Jhf5sdczvyrPIjH533basHPtLBcGPi59BcshFWUj6e55GqbGOO&rev=53&drawingRevisionAccessToken=gDw7hr7UE9AUZA&h=288&w=335&ac=1)
+  ![](./img/29.png)
 
   
 
@@ -182,7 +182,7 @@
 
     
 
-    ![](https://docs.google.com/drawings/d/sat_YEGLcdhQkC1FVYgznCw/image?parent=e/2PACX-1vQiuXMoUJloXB41go11kimhAxCGB0Jhf5sdczvyrPIjH533basHPtLBcGPi59BcshFWUj6e55GqbGOO&rev=198&drawingRevisionAccessToken=8JBQllM_TFbCTA&h=398&w=335&ac=1)
+    ![](./img/30.png)
 
   
 
@@ -195,7 +195,7 @@
 
   
 
-  ![](https://docs.google.com/drawings/d/svPQVk38Yg3ai0RougO_9AQ/image?parent=e/2PACX-1vQiuXMoUJloXB41go11kimhAxCGB0Jhf5sdczvyrPIjH533basHPtLBcGPi59BcshFWUj6e55GqbGOO&rev=27&drawingRevisionAccessToken=buq1wmyILPe6Tg&h=401&w=335&ac=1)
+  ![](./img/31.png)
 
   
 
@@ -262,7 +262,7 @@
 
         
 
-        ![](https://docs.google.com/drawings/d/sdOZUCi52XKRABd-wDZB6SQ/image?parent=e/2PACX-1vQiuXMoUJloXB41go11kimhAxCGB0Jhf5sdczvyrPIjH533basHPtLBcGPi59BcshFWUj6e55GqbGOO&rev=100&drawingRevisionAccessToken=mvtijQPr_xAaTA&h=273&w=211&ac=1)
+        ![](./img/32.png)
 
       - **각각의 함수는 [[scope]] 프로퍼티로 자신이 생성된 실행 컨텍스트의 스코프 체인을 참조한다.**
 
@@ -301,7 +301,7 @@
 
         
 
-        ![](https://docs.google.com/drawings/d/sg3Iyjr2pFy6CeY51s-9jMg/image?parent=e/2PACX-1vQiuXMoUJloXB41go11kimhAxCGB0Jhf5sdczvyrPIjH533basHPtLBcGPi59BcshFWUj6e55GqbGOO&rev=110&drawingRevisionAccessToken=G2G5rZAq1wcAQA&h=198&w=335&ac=1)
+        ![](./img/33.png)
 
 
 
@@ -345,7 +345,7 @@
 
         
 
-      ![](https://docs.google.com/drawings/d/sgJWhjnXkRQrZfWT609b3JQ/image?parent=e/2PACX-1vQiuXMoUJloXB41go11kimhAxCGB0Jhf5sdczvyrPIjH533basHPtLBcGPi59BcshFWUj6e55GqbGOO&rev=260&drawingRevisionAccessToken=LRmCEugOsRiP_g&h=324&w=513&ac=1)
+      ![](./img/34.png)
 
       
 
@@ -383,7 +383,7 @@
 
     
 
-    ![](https://docs.google.com/drawings/d/e/2PACX-1vSupQD3UQkGFjFLhR0Px0kuDvwbDF_C3sQ8smjL8UZyNxnd0lfYODrh0h_fcv_89e9PryZSDmwhAhHZ/pub?w=1320&h=903)
+    ![](./img/35.png)
 
     
 
@@ -414,7 +414,7 @@
 
       
 
-    ![](https://docs.google.com/drawings/d/e/2PACX-1vRcDtejuz2wO-kUOi5sVs35MDLgsb_EO4qJQ1HmvhIgFHn1ndgsqqA783KSjUJ5ANuQWSS8FvP0MJJe/pub?w=1324&h=906)
+    ![](./img/36.png)
 
 
 
@@ -471,7 +471,7 @@
 
       
 
-      ![](https://docs.google.com/drawings/d/e/2PACX-1vRHWtbBntAYidgA0x5p7rng_5vg6d08aj0kkdhLmQv8udjAWS85j6TxU4jyVOxXpDGS8AMm7EVvkUzI/pub?w=1351&h=909)
+      ![](./img/37.png)
 
       
 
@@ -551,7 +551,7 @@
     inner();
     ```
 
-    ![](https://docs.google.com/drawings/d/e/2PACX-1vSneBaIzgxzVGL7sCHCi4PdQGSz2pbCFFKBF47da-ZqoUpHDdAKwqY0aTRiIHlZWkdXyn6s0gNigI-7/pub?w=1327&h=1081)
+    ![](./img/38.png)
 
     
 
@@ -578,7 +578,7 @@
 
   
 
-  - ![](https://docs.google.com/drawings/d/szxITl2h7KPchimvKoH-C9w/image?parent=e/2PACX-1vQiuXMoUJloXB41go11kimhAxCGB0Jhf5sdczvyrPIjH533basHPtLBcGPi59BcshFWUj6e55GqbGOO&rev=310&drawingRevisionAccessToken=nTkrzY1i10PaWA&h=356&w=570&ac=1)
+  - ![](./img/39.png)
 
     - 위 그림은 자바스크립트로 클로저를 구현하는 전형적인 패턴이다.
       - 그림에서 보듯이 외부 함수의 호출이 이루어지고, 이 외부 함수에서 새로운 함수가 반환된다.
@@ -616,7 +616,7 @@
     
     - 앞 예제의 스코프 체인을 그림으로 나타내면 다음과 같다.
     
-      ![](https://docs.google.com/drawings/d/e/2PACX-1vSDHf4OjA3w2H21viYJ9oAlXHBRX02AdXbQNLvmsvtRohfMxt3kMAfxAiaLVByrDYrWTu2fuIm6CmgQ/pub?w=1194&h=1143)
+      ![](./img/40.png)
     
       - 따라서 `exam1(2)`를 호출하면, arg1, arg2, local 값은 outerFunc 변수 객체에서 찾고, innerArg는 innerFunc 변수 객체에서 찾는다.
       - 결과는 ((2 + 4) / (2 + 8))가 된다.
@@ -854,7 +854,7 @@
 
     - 클로저에 있는 스코프 체인을 그림으로 그려보면 다음과 같다.
 
-      ![](https://docs.google.com/drawings/d/e/2PACX-1vRiSeG_FziOIw93pxMKw1o_nXDtzoc2E4sdcGQgE5YRCgYA_bRShMdHwOOX7Gn6wfw4AlP2dE32g8ir/pub?w=1225&h=1134)
+      ![](./img/41.png)
 
 
 
