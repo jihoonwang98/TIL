@@ -136,15 +136,132 @@
 
 
 
+- `prettier` 설정
+
+  ```shell
+  npm install --save-dev --save-exact prettier 
+  또는
+  yarn add --dev --exact prettier
+  ```
+
+  - To use it:
+    - Add prettier to your project with npm install prettier --save-dev or install it globally
+    - Select the code or file you want to format using Prettier
+    - Use the "Reformat with Prettier" action (Alt-Shift-Cmd-P on macOS or Alt-Shift-Ctrl-P on Windows and Linux) or find it using the "Find Action" popup (Cmd/Ctrl-Shift-A)
+  - To run Prettier on save, tick the "Run on save for files" option in Preferences/Settings | Languages & Frameworks | JavaScript | Prettier.
+  - `Opt-Shift-Cmd-P on macOS` 누르면 prettier 적용됨
+
+- Typescript와 ESlint, Prettier 관련 플러그인 설치
+
+  ```js
+  $npm i -D typescript eslint prettier
+  $npm i -D @typescript-eslint/eslint-plugin @typescript-eslint/parser # 타입스크립트 플러그인
+  $npm i -D eslint-config-prettier eslint-plugin-prettier # prettier 플러그인
+  
+  npm i -D eslint-config-airbnb  # airbnb 스타일
+  npx install-peerdeps --dev eslint-config-airbnb-base # 위에거 안되면 이걸로
+  ```
+
+  
+
+
+
+- `.prettierrc`
+
+  ```
+  {
+    "singleQuote": true,
+    "parser": "typescript",
+    "semi": true,
+    "useTabs": false,
+    "tabWidth": 2,
+    "trailingComma": "all",
+    "printWidth": 120,
+    "arrowParens": "always"
+  }
+  ```
+
+  - https://prettier.io/docs/en/options.html
+
+- `.eslintrc.js`
+
+  ```js
+  module.exports = {
+    parser: '@typescript-eslint/parser',
+    plugins: ['@typescript-eslint', 'react-hooks'],
+    extends: [
+      'airbnb', // or airbnb-base
+      'plugin:react/recommended',
+      'plugin:jsx-a11y/recommended', // 설치 한경우
+      'plugin:import/errors', // 설치한 경우
+      'plugin:import/warnings', // 설치한 경우
+      'plugin:@typescript-eslint/recommended',
+      'plugin:prettier/recommended',
+    ],
+    rules: {
+      'prettier/prettier': 0,
+    },
+    settings: {
+      'import/resolver': {
+        node: {
+          extensions: ['.js', '.jsx', '.ts', '.tsx'],
+        },
+      },
+    },
+  };
+  
+  ```
+
+  
+
+- `typeorm`
+
+  - 설치
+
+    ```shell
+    npm install typeorm --save  # typeorm 설치
+    npm install reflect-metadata --save # reflect-metadata 설치해야함 
+    npm install @types/node --save-dev
+    npm install pg --save
+    ```
+
+  - `app.ts` 같은 당신의 애플리케이션의 global place에 `reflect-metadata`를 import 하세요
+
+    ```tsx
+    import "reflect-metadata"
+    ```
+
+  - TypeScript configuration
+
+    - TypeScript version **3.3** or higher 아래와 같은 설정을 `tsconfig.json`에 추가
+
+      ```json
+      "emitDecoratorMetadata": true,
+      "experimentalDecorators": true,
+      ```
+
+    - You may also need to enable `es6` in the `lib` section of compiler options, or install `es6-shim` from `@types`.
+
+  - You can also run `typeorm init` on an existing node project, but be careful - it may override some files you already have.
+
+  - While installation is in progress, edit the `ormconfig.json` file
 
 
 
 
 
+- `typedi` + `typeorm`
 
+  - [`typeorm-typedi-extensions`](https://github.com/typeorm/typeorm-typedi-extensions)
 
+  - 설치
 
+    ```
+    npm install typeorm-typedi-extensions typedi reflect-metadata
+    ```
 
+    
 
+  
 
-
+  
