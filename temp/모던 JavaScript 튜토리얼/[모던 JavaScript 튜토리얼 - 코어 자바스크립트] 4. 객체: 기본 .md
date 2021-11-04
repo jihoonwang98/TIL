@@ -1461,15 +1461,13 @@
 
   ```js
   function BigUser() {
-  
     this.name = "원숭이";
-  
     return { name: "고릴라" };  // <-- this가 아닌 새로운 객체를 반환함
   }
   
   alert( new BigUser().name );  // 고릴라
   ```
-
+  
 - 아무것도 `return`하지 않는 예시를 살펴봅시다. 원시형을 반환하는 경우와 마찬가지로 두 번째 규칙이 적용됩니다.
 
   ```js

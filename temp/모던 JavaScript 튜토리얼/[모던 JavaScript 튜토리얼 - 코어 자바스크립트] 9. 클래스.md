@@ -538,9 +538,9 @@ class MyClass {
 >       sayHi() { alert(phrase) }
 >     }
 >   }
->   
+>     
 >   class User extends f("Hello") {}
->   
+>     
 >   new User().sayHi(); // Hello
 >   ```
 >
@@ -1418,7 +1418,7 @@ MyClass.method = ...
   - 이제 `waterAmount`를 보호해서 `waterAmount`를 통제해 보겠습니다. 
     - 예시로 `waterAmount`를 0 미만의 값으로는 설정하지 못하도록 만들어 볼 겁니다.
 
-- **protexted 프로퍼티 명 앞엔 밑줄 `_`이 붙습니다.**
+- **protected 프로퍼티 명 앞엔 밑줄 `_`이 붙습니다.**
 
   - 자바스크립트에서 강제한 사항은 아니지만, <u>밑줄은 프로그래머들 사이에서 외부 접근이 불가능한 프로퍼티나 메서드를 나타낼 때 씁니다</u>.
   - `waterAmount`에 밑줄을 붙여 protected 프로퍼티로 만들어줍시다.
