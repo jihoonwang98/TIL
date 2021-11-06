@@ -1,8 +1,20 @@
-# [NestJS 한글 매뉴얼] OVERVIEW - Exception filters
+# [NestJS 한국어 매뉴얼 - OVERVIEW] Exception filters
 
 > https://docs.nestjs.kr/exception-filters
 
 
+
+### 목차
+
+- Exception filters
+- Throwing standard exceptions
+- Custom exceptions
+- Built-in HTTP exceptions
+- Exception filters
+- Arguments host
+- Binding filters
+- Catch everything
+- Inheritance
 
 
 
@@ -17,7 +29,7 @@
 
 - 기본적으로 이 작업은 `HttpException` 유형의 예외(및 그 하위 클래스)를 처리하는 내장 **전역 예외필터**에 의해 수행됩니다. 
 
-- 예외가 **인식되지 않음**(`HttpException`도 `HttpException`에서 상속되는 클래스도 아님)이면 내장된 예외필터가 다음과 같은 기본 JSON 응답을 생성합니다.
+- 예외가 **인식되지 않음**(`HttpException`도 아니고 `HttpException`에서 상속되는 클래스도 아닌 경우)이면 내장된 예외필터가 다음과 같은 기본 JSON 응답을 생성합니다.
 
   ```json
   {
@@ -228,12 +240,195 @@
   - `host` 매개변수는 `ArgumentsHost` 객체입니다. 
     - `ArgumentsHost`는 [실행 컨텍스트 장](https://docs.nestjs.kr/fundamentals/execution-context)* 에서 자세히 살펴볼 강력한 유틸리티 객체입니다.
   - 위의 코드 샘플에서는 이를 사용하여 원래 요청 핸들러(예외가 발생한 컨트롤러에서)로 전달되는 `Request` 및 `Response` 객체에 대한 참조를 얻습니다. 
+  - 위의 코드 샘플에서는 원하는 `Request` 및 `Response` 객체를 가져오기 위해 `ArgumentsHost`에 몇가지 헬퍼 메서드를 사용했습니다. 
+    - [여기](https://docs.nestjs.kr/fundamentals/execution-context)에서 `ArgumentsHost`대해 자세히 알아보세요.
+  
+- *이 수준의 추상화에 대한 이유는 `ArgumentsHost`가 모든 컨텍스트(예: 현재 작업중인 HTTP 서버 컨텍스트뿐만 아니라 마이크로서비스 및 WebSockets)에서 작동하기 때문입니다. 
+
+- 실행 컨텍스트 장에서는 `ArgumentsHost`와 그 헬퍼 함수를 사용하여 **모든** 실행 컨텍스트에 대한 적절한 [기본 인수](https://docs.nestjs.kr/fundamentals/execution-context#host-methods)에 액세스하는 방법을 알아봅니다. 
+
+  ​	이를 통해 모든 컨텍스트에서 작동하는 일반 예외필터를 작성할 수 있습니다.
 
 
 
+## Binding filters
+
+- 새로운 `HttpExceptionFilter`를 `CatsController`의 `create()`메서드에 연결해 보겠습니다.
+
+  ```typescript
+  // cats.controller.ts
+  @Post()
+  @UseFilters(new HttpExceptionFilter())
+  async create(@Body() createCatDto: CreateCatDto) {
+    throw new ForbiddenException();
+  }
+  ```
+
+> **힌트**
+>
+> - `@UseFilters()` 데코레이터는 `@nestjs/common` 패키지에서 가져옵니다.
+
+- 여기서는 `@UseFilters()` 데코레이터를 사용했습니다. 
+
+  - `@Catch()` 데코레이터와 유사하게 단일 필터 인스턴스 또는 쉼표로 구분된 필터 인스턴스 목록을 사용할 수 있습니다. 
+
+  - 여기에서 `HttpExceptionFilter`의 인스턴스를 생성했습니다. 
+
+  - 또는 <u>인스턴스 대신 클래스를 전달하여 프레임워크에 대한 인스턴스화 책임을 남겨 **종속성 주입**을 활성화할 수 있습니다.</u>
+
+    ```typescript
+    // cats.controller.ts
+    @Post()
+    @UseFilters(HttpExceptionFilter)
+    async create(@Body() createCatDto: CreateCatDto) {
+      throw new ForbiddenException();
+    }
+    ```
+
+> **힌트**
+>
+> - 가능한 경우 인스턴스 대신 클래스를 사용하여 필터를 적용하는 것이 좋습니다. 
+> - Nest는 전체 모듈에서 동일한 클래스의 인스턴스를 쉽게 재사용할 수 있으므로 **메모리 사용량**을 줄입니다.
+
+- 위의 예에서 `HttpExceptionFilter`는 단일 `create()` 라우드 핸들러에만 적용되어 <u>메소드 범위</u>가 됩니다. 
+
+- **예외필터는 메서드 범위, 컨트롤러 범위 또는 전역 범위등 다양한 수준으로 범위를 지정할 수 있습니다**. 
+
+  - 예를 들어 필터를 **컨트롤러 범위**로 설정하려면 다음을 수행합니다.
+
+    ```typescript
+    // cats.controller.ts
+    @UseFilters(new HttpExceptionFilter())
+    export class CatsController {}
+    ```
+
+    - 이 구성은 `CatsController`내에 정의된 모든 라우트 핸들러에 대해 `HttpExceptionFilter`를 설정합니다.
+
+  - **전역범위** 필터를 만들려면 다음을 수행합니다.
+
+    ```ts
+    // main.ts
+    async function bootstrap() {
+      const app = await NestFactory.create(AppModule);
+      app.useGlobalFilters(new HttpExceptionFilter());
+      await app.listen(3000);
+    }
+    bootstrap();
+    ```
+
+    - **경고**: `useGlobalFilters()` 메서드는 게이트웨이 또는 하이브리드 애플리케이션에 대한 필터를 설정하지 않습니다.
+
+    - 전역범위 필터는 모든 컨트롤러 및 모든 라우트 핸들러에 대해 전체 애플리케이션에서 사용됩니다. 
+
+    - 의존성 주입과 관련하여 모듈 외부에서 등록된 전역 필터(위의 예에서와 같이 `useGlobalFilters()`사용)는 모듈의 컨텍스트 외부에서 수행되므로 종속성을 주입할 수 없습니다. 
+
+    - 이 문제를 해결하기 위해 다음 구성을 사용하여 **모든 모듈에서 직접** 전역범위 필터를 등록할 수 있습니다.
+
+      ```typescript
+      // app.module.ts
+      import { Module } from '@nestjs/common';
+      import { APP_FILTER } from '@nestjs/core';
+      
+      @Module({
+        providers: [
+          {
+            provide: APP_FILTER,
+            useClass: HttpExceptionFilter,
+          },
+        ],
+      })
+      export class AppModule {}
+      ```
+
+      - 이 기술을 사용하여 필요한만큼 필터를 추가할 수 있습니다. 프로바이더 배열에 각각을 추가하기만 하면 됩니다.
+
+> **힌트**
+>
+> - 이 접근방식을 사용하여 필터에 대한 종속성 주입을 수행할 때 이 구성이 사용되는 모듈에 관계없이 필터는 실제로 전역이라는 점에 유의하십시오. 
+> - 어디에서 해야합니까? 
+>   - 필터(위 예에서는 `HttpExceptionFilter`)가 정의된 모듈을 선택합니다. 
+>   - 또한 `useClass`가 커스텀 프로바이더 등록을 처리하는 유일한 방법은 아닙니다. 
+>   - [여기](https://docs.nestjs.kr/fundamentals/custom-providers)에서 자세히 알아보세요.
 
 
 
+## Catch everything
+
+- 처리되지 않은 **모든** 예외를 잡으려면(예외 유형에 관계없이) `@Catch()` 데코레이터의 매개변수 목록을 비워둡니다(예: `@Catch()`).
+
+  ```typescript
+  import {
+    ExceptionFilter,
+    Catch,
+    ArgumentsHost,
+    HttpException,
+    HttpStatus,
+  } from '@nestjs/common';
+  
+  @Catch()
+  export class AllExceptionsFilter implements ExceptionFilter {
+    catch(exception: unknown, host: ArgumentsHost) {
+      const ctx = host.switchToHttp();
+      const response = ctx.getResponse();
+      const request = ctx.getRequest();
+  
+      const status =
+        exception instanceof HttpException
+          ? exception.getStatus()
+          : HttpStatus.INTERNAL_SERVER_ERROR;
+  
+      response.status(status).json({
+        statusCode: status,
+        timestamp: new Date().toISOString(),
+        path: request.url,
+      });
+    }
+  }
+  ```
+
+  - 위의 예에서 필터는 타입(클래스)에 관계없이 발생한 각 예외를 포착합니다.
 
 
 
+## Inheritance
+
+- 일반적으로 애플리케이션 요구사항을 충족하도록 제작된 완전히 커스텀 예외필터를 만듭니다. 
+
+- 그러나 기본 제공되는 디폴트 **전역 예외필터**를 확장하고 특정요인에 따라 동작을 재정의하려는 경우 사용사례가 있을 수 있습니다.
+
+- 예외 처리를 기본필터에 위임하려면 `BaseExceptionFilter`를 확장하고 상속된 `catch()` 메서드를 호출해야 합니다.
+
+  ```typescript
+  // all-exceptions.filter.ts
+  import { Catch, ArgumentsHost } from '@nestjs/common';
+  import { BaseExceptionFilter } from '@nestjs/core';
+  
+  @Catch()
+  export class AllExceptionsFilter extends BaseExceptionFilter {
+    catch(exception: unknown, host: ArgumentsHost) {
+      super.catch(exception, host);
+    }
+  }
+  ```
+
+  - **경고: **`BaseExceptionFilter`를 확장하는 메서드 범위 및 컨트롤러 범위 필터는 `new`로 인스턴스화 하면 안됩니다. 대신 프레임워크가 자동으로 인스턴스화하도록 합니다.
+  - 위의 구현은 접근방식을 보여주는 셸일뿐입니다. 
+    - 확장된 예외필터의 구현에는 맞춤형 **비즈니스** 로직(예: 다양한 조건 처리)이 포함됩니다.
+
+- 전역필터는 기본필터를 **확장할 수 있습니다**. 이는 두가지 방법중 하나로 수행할 수 있습니다.
+
+  - 첫번째 방법은 커스텀 전역필터를 인스턴스화할 때 `HttpServer` 참조를 삽입하는 것입니다.
+
+    ```typescript
+    async function bootstrap() {
+      const app = await NestFactory.create(AppModule);
+    
+      const { httpAdapter } = app.get(HttpAdapterHost);
+      app.useGlobalFilters(new AllExceptionsFilter(httpAdapter));
+    
+      await app.listen(3000);
+    }
+    bootstrap();
+    ```
+
+  - 두번째 방법은 여기에 [표시된대로](https://docs.nestjs.kr/exception-filters#binding-filters)`APP_FILTER` 토큰을 사용하는 것입니다.

@@ -1,6 +1,20 @@
-# [NestJS 한글 매뉴얼] Middleware
+# [NestJS 한국어 매뉴얼 - OVERVIEW] Middleware
 
 > https://docs.nestjs.kr/middleware
+
+
+
+### 목차
+
+- Middleware
+- Dependency injection
+- Applying middleware
+- Route wildcards
+- Middleware consumer
+- Excluding routes
+- Functional middleware
+- Multiple middleware
+- Global middleware
 
 
 
@@ -19,7 +33,7 @@
 - 공식 익스프레스 문서의 다음 설명은 미들웨어의 기능을 설명합니다.
 - 미들웨어 기능은 다음 작업을 수행할 수 있습니다.
   - 모든 코드를 실행하십시오.
-  - 요청 및 응답 객체를 변경합니다.
+  - **<u>요청 및 응답 객체를 변경</u>**합니다.
   - 요청-응답주기를 종료합니다.
   - 스택의 next 미들웨어 함수를 호출합니다.
   - 현재 미들웨어 함수가 요청-응답주기를 종료하지 않으면 `next()`를 호출하여 next 미들웨어 기능에 제어를 전달합니다. 그렇지 않으면 요청이 중단됩니다.
@@ -84,7 +98,7 @@
   ```
 
   - `AppModule` 레벨에서 `LoggerMiddleware`를 설정하는 예제입니다.
-  - 위의 예에서는 이전에 `CatsController` 내부에 정의된 `/cats` 라우트 핸들러에 대해 `LoggerMiddleware`를 설정했습니다.s
+  - 위의 예에서는 이전에 `CatsController` 내부에 정의된 `/cats` 라우트 핸들러에 대해 `LoggerMiddleware`를 설정했습니다.
 
 - 예제 2
 
