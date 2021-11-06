@@ -1,12 +1,30 @@
-# [NestJS 한글 매뉴얼] OVERVIEW - Pipes
+# [NestJS 한국어 매뉴얼 - OVERVIEW] Pipes
 
 > https://docs.nestjs.kr/pipes
 
 
 
+### 목차
+
+- Pipes
+- Built-in pipes
+- Binding pipes
+- Custom pipes
+- Schema based validation
+- Object schema validation
+- Binding validation pipes
+- Class validator
+- Global scoped pipes
+- The built-in ValidationPipe
+- Transformation use case
+- Providing defaults
+
+
+
 ## Pipes
 
-- 파이프는 `@Injectable()` 데코레이터로 주석이 달린 클래스입니다. 파이프는 `PipeTransform` 인터페이스를 구현해야 합니다.
+- 파이프는 `@Injectable()` 데코레이터로 주석이 달린 클래스입니다. 
+- 파이프는 `PipeTransform` 인터페이스를 구현해야 합니다.
 
 ![](https://docs.nestjs.kr/assets/Pipe_1.png)
 
@@ -15,7 +33,7 @@
 - Pipe의 두가지 일반적인 사용 사례
   - **변환**(transformation): 입력 데이터를 원하는 형식으로 변환(예: 문자열에서 정수로)
   - **유효성 검사**(validation): 입력 데이터를 평가하고 유효한 경우 변경하지 않고 전달합니다. 그렇지 않으면 데이터가 올바르지 않을 때 예외를 발생시킵니다.
-  - 두 경우 모두 파이프는 [컨트롤러 라우트 핸들러](https://docs.nestjs.kr/controllers#route-parameters)가 처리하는 `인수(arguments)`에서 작동합니다.
+  - 두 경우 모두 **<u>파이프는 [컨트롤러 라우트 핸들러](https://docs.nestjs.kr/controllers#route-parameters)가 처리하는 `인수(arguments)`에서 작동합니다.</u>**
 - Pipe 실행 시점
   - Nest는 **<u>메소드가 호출되기 직전</u>**에 파이프를 삽입하고 파이프는 메소드로 향하는 인수를 수신하고 이에 대해 작동합니다. 
   - 모든 변환 또는 유효성 검사 작업은 해당 시간에 발생하며 그 후 라우트 핸들러가(잠재적으로) 변환된 인수와 함께 호출됩니다.
@@ -32,7 +50,8 @@
 >
 > - 파이프는 예외 영역 내에서 실행됩니다. 
 > - 이것은 파이프가 예외를 던질 때 예외 계층 (전역 예외필터 및 현재 컨텍스트에 적용되는 모든 [예외필터](https://docs.nestjs.kr/exception-filters))에 의해 처리된다는 것을 의미합니다. 
-> - 위의 내용을 고려할 때 파이프에서 예외가 발생하면 이후에 컨트롤러 메서드가 실행되지 않음을 분명히해야 합니다. 이는 시스템 경계의 외부 소스에서 애플리케이션으로 들어오는 데이터를 검증하기 위한 모범사례 기술을 제공합니다.
+> - 위의 내용을 고려할 때 파이프에서 예외가 발생하면 이후에 컨트롤러 메서드가 실행되지 않음을 분명히해야 합니다. 
+> - 이는 시스템 경계의 외부 소스에서 애플리케이션으로 들어오는 데이터를 검증하기 위한 모범사례 기술을 제공합니다.
 
 
 
@@ -45,7 +64,7 @@
   - `ParseArrayPipe`
   - `ParseUUIDPipe`
   - `DefaultValuePipe`
-  - 모두 `@nestjs/common` 패키지에서 내보내집니다.
+    - 모두 `@nestjs/common` 패키지에서 내보내집니다.
 
 - `ParseIntPipe`는 메서드 핸들러 매개변수가 자바스크립트 정수로 변환되도록 해준다. 또는 변환에 실패하면 예외가 발생함.
 
@@ -84,8 +103,6 @@
     - 예외는 `findOne()` 메서드의 본문이 실행되지 않도록 한다.
 
   - 위의 예에서는 인스턴스가 아닌 클래스(`ParseIntPipe`)를 전달하여 인스턴스화를 프레임워크에 맡기고 종속성 주입을 활성화합니다.
-
-
 
 
 
@@ -135,8 +152,17 @@
     >
     > - `ParseUUIDPipe()`를 사용하는 경우 버전 3, 4 또는 5에서 UUID를 구문분석합니다. 
     > - 특정 버전의 UUID만 필요한 경우 파이프 옵션에서 버전을 전달할 수 있습니다.
-
+    
+    
   
+
+- 위에서 우리는 내장 파이프의 다양한 `Parse*` 계열을 바인딩하는 예를 보았습니다. 
+
+  - 바인딩 유효성 검사 파이프는 약간 다릅니다. 다음 섹션에서 논의할 것입니다.
+
+  > **힌트**
+  >
+  > - 또한 검증 파이프의 광범위한 예는 [검증기법](https://docs.nestjs.kr/techniques/validation)을 참조하십시오.
 
 
 
@@ -578,18 +604,3 @@ export class ValidationPipe implements PipeTransform<any> {
   ```
 
   
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
