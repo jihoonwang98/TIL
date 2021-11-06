@@ -1,0 +1,125 @@
+# [NestJS 한국어 매뉴얼] 목차
+
+> https://docs.nestjs.kr/
+
+### 목차
+
+- Introduction
+- Overview
+  - First steps
+  - Controllers
+  - Providers
+  - Modules
+  - Middleware
+  - Exception filters
+  - Pipes
+  - Guards
+  - Interceptors
+  - Custom decorators
+- Fundamentals
+  - Custom providers
+  - Asynchronous providers
+  - Dynamic modules
+  - Circular dependency
+  - Module reference
+  - Lazy-loading modules
+  - Execution context
+  - Lifecycle events
+  - Platform agnosticism
+  - Testing
+- Techniques
+  - Database
+  - Mongo
+  - Configuration
+  - Validation
+  - Caching
+  - Serialization
+  - Versioning
+  - Task scheduling
+  - Queues
+  - Logging
+  - Cookies
+  - Events
+  - Compression
+  - File upload
+  - Streaming Files
+  - HTTP module
+  - Session
+  - MVC
+  - Perfromance (Fastify)
+  - Server-Sent Events
+- Security
+  - Authentication
+  - Authorization
+  - Encryption and Hashing
+  - Helmet
+  - CORS
+  - CSRF Protection
+  - Rate limiting
+- GraphQL
+  - Quick start
+  - Resolvers
+  - Mutations
+  - Subscriptions
+  - Scalars
+  - Directives
+  - Plugins
+  - Interfaces
+  - Unions and Enums
+  - Field middleware
+  - Mapped types
+  - Complexity
+  - Extensions
+  - CLI Plugin
+  - Generating SDL
+  - Other features
+  - Federation
+- WebSockets
+  - Gateways
+  - Exception filters
+  - Pipes
+  - Guards
+  - Interceptors
+  - Adapters
+- MicroServices
+  - Overview
+  - Redis
+  - MQTT
+  - NATS
+  - RabbitMQ
+  - Kafka
+  - gRPC
+  - Custom transporters
+  - Exception filters
+  - Pipes 
+  - Guards
+  - Interceptors
+- StandAlone Apps
+- CLI
+  - Overview
+  - Workspaces
+  - Libraries
+  - Usage
+  - Scripts
+- OpenAPI
+  - Introduction
+  - Types and Parameters
+  - Operations
+  - Security
+  - Mapped Types
+  - Decorators
+  - CLI Plugin
+  - Other features
+  - Migration guide
+- Recipes
+  - CRUD generator
+  - Hot reload
+  - TypeORM
+  - Mongoose
+  - Sequelize
+  - Router module
+  - Swagger
+  - Health checks
+  - CQRS
+  - Compodoc
+  - Serve static
