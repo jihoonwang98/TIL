@@ -1,10 +1,31 @@
-# [NestJS Manual] Controllers
+# [NestJS 한국어 매뉴얼 - OVERVIEW] Controllers
 
-> https://docs.nestjs.kr/
+> https://docs.nestjs.kr/first-steps
 
 
 
-### Controllers
+### 목차
+
+- Controllers
+- Routing
+- Request Object
+- Resources
+- Route wildcards
+- Status code
+- Headers
+- Redirection
+- Route parameters
+- Sub-Domain Routing
+- Scopes
+- Asynchronicity
+- Request payloads
+- Full resource sample
+- Getting up and running
+- Library-specific approach
+
+
+
+## Controllers
 
 - 컨트롤러의 책임 및 목적
 
@@ -19,9 +40,9 @@
 
     > **꿀팁**
     >
-    > [validation](https://docs.nestjs.kr/techniques/validation)이 내장된 CRUD 컨트롤러를 빠르게 생성하려면,
+    > - [validation](https://docs.nestjs.kr/techniques/validation)이 내장된 CRUD 컨트롤러를 빠르게 생성하려면,
     >
-    > CLI의 [CRUD 생성기](https://docs.nestjs.kr/recipes/crud-generator#crud-generator): `nest g resource [name]`을 사용할 수 있습니다.
+    > - CLI의 [CRUD 생성기](https://docs.nestjs.kr/recipes/crud-generator#crud-generator): `nest g resource [name]`을 사용할 수 있습니다.
 
 
 
@@ -55,6 +76,7 @@
   - `findAll()` 메서드 앞에 있는 `@Get()` HTTP 요청 메서드 데코레이터는 Nest에 HTTP 요청에 대한 특정 엔드포인트에 대한 핸들러를 생성하도록 지시합니다. 
 
     - **엔드포인트**는 HTTP 요청 메서드(이 경우 GET) 및 라우트 경로에 해당합니다.
+      - 엔드포인트 = HTTP 메서드 + 라우트 경로
     - 핸들러의 **라우트 경로**는 컨트롤러에 대해 선언된(선택 사항) 접두사와 메소드 데코레이터에 지정된 경로를 연결하여 결정됩니다. 
 
   - 모든 라우트 (`cats`)에 대한 접두사를 선언하고 데코레이터에 경로 정보를 추가하지 않았으므로 Nest는 `GET /cats` 요청을 이 핸들러에 매핑합니다.
@@ -75,7 +97,7 @@
 
       | 옵션                      | 설명                                                         |
       | ------------------------- | ------------------------------------------------------------ |
-      | 표준 (권장)               | 이 내장 메서드를 사용하면 요청 핸들러가 자바스크립트 객체 또는 배열을 반환할 때 **자동**으로 JSON으로 직렬화됩니다. 그러나 자바스크립트 기본 타입(예: `string`, `number`, `boolean`)을 반환하면 Nest는 직렬화를 시도하지 않고 값만 보냅니다. 이렇게 하면 응답처리가 간단해집니다. 값을 반환하기만 하면 Nest가 나머지 작업을 처리합니다.  또한 응답의 **상태 코드**는 201을 사용하는 POST 요청을 제외하고는 항상 기본적으로 200입니다. 핸들러 수준에서 `@HttpCode(...)` 데코레이터를 추가하여 이 동작을 쉽게 변경할 수 있습니다(참조: [상태 코드](https://docs.nestjs.kr/controllers#status-code)). |
+      | 표준 (권장)               | 이 내장 메서드를 사용하면 **<u>요청 핸들러가 자바스크립트 객체 또는 배열을 반환할 때 자동으로 JSON으로 직렬화</u>**됩니다. 그러나 자바스크립트 기본 타입(예: `string`, `number`, `boolean`)을 반환하면 Nest는 직렬화를 시도하지 않고 값만 보냅니다. 이렇게 하면 응답처리가 간단해집니다. 값을 반환하기만 하면 Nest가 나머지 작업을 처리합니다.  또한 응답의 **상태 코드**는 201을 사용하는 POST 요청을 제외하고는 항상 기본적으로 200입니다. 핸들러 수준에서 `@HttpCode(...)` 데코레이터를 추가하여 이 동작을 쉽게 변경할 수 있습니다(참조: [상태 코드](https://docs.nestjs.kr/controllers#status-code)). |
       | 라이브별 Library-specific | 메소드 핸들러 시그니처(예: `findAll(@Res() response)`)에서 `@Res()` 데코레이터를 사용하여 삽입할 수 있는 라이브러리별(예: Express) [응답객체](https://expressjs.com/en/api.html#res)를 사용할 수 있습니다. 예를 들어 Express에서는 `response.status(200).send()`와 같은 코드를 사용하여 응답을 구성할 수 있습니다. |
 
     > **경고**
@@ -86,13 +108,26 @@
 
 
 
+- 응답값 정리
+  - 기본 옵션
+    - 객체(배열 포함)
+      - 자동으로 JSON 직렬화
+    - 기본 타입(number, string, boolean)
+      - 직렬화 X, 값만 보냄
+    - 상태코드
+      - POST 요청 - 201, 나머지 200
+
+
+
+
+
 ### Request Object
 
 - 핸들러는 종종 클라이언트 **요청** 세부정보에 액세스해야 합니다.
 
 - Nest는 기본 플랫폼(기본적으로 Express)의 <span style="color:red">요청 객체</span>에 대한 액세스를 제공합니다.
 
-- 핸들러의 시그니처에 `@Req()` 데코레이터를 추가하여 Nest에 주입하도록 지시하여 요청객체에 액세스할 수 있습니다.
+- 핸들러의 시그니처에 **<u>`@Req()` 데코레이터를 추가하여 Nest에 주입하도록 지시하여 요청객체에 액세스할 수 있습니다</u>**.
 
 - 예제
 
@@ -221,7 +256,7 @@
 > `@nestjs/common` 패키지에서 `HttpCode`를 가져옵니다.
 
 - 종종 상태코드는 정적이 아니고 다양한 요인에 따라 달라집니다.
-- 이 경우 라이브러리별 **응답**(`@Res()`를 사용하여 주입)객체를 사용할 수 있습니다 (또는 오류가 발생한 경우 예외 발생).
+  - 이 경우 라이브러리별 **응답**(`@Res()`를 사용하여 주입)객체를 사용할 수 있습니다 (또는 오류가 발생한 경우 예외 발생).
 
 
 
@@ -536,6 +571,10 @@
 
 
 
+- 컨트롤러를 만들었으면 모듈에 등록해주자.
+
+
+
 ### Library-specific approach
 
 - 지금까지 응답을 조작하는 Nest 표준방식에 대해 논의했습니다.
@@ -587,3 +626,4 @@
       ```
 
       - 이제 네이티브 응답객체와 상호작용할 수 있지만(예: 특정조건에 따라 쿠키 또는 헤더설정) 나머지는 프레임워크에 맡깁니다.
+
