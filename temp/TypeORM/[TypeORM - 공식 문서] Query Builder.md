@@ -621,15 +621,550 @@
 
 ## 14. Join
 
+```ts
+import {Entity, PrimaryGeneratedColumn, Column, OneToMany} from "typeorm";
+import {Photo} from "./Photo";
+
+@Entity()
+export class User {
+
+    @PrimaryGeneratedColumn()
+    id: number;
+
+    @Column()
+    name: string;
+
+    @OneToMany(type => Photo, photo => photo.user)
+    photos: Photo[];
+}
+```
+
+```ts
+import {Entity, PrimaryGeneratedColumn, Column, ManyToOne} from "typeorm";
+import {User} from "./User";
+
+@Entity()
+export class Photo {
+
+    @PrimaryGeneratedColumn()
+    id: number;
+
+    @Column()
+    url: string;
+
+    @ManyToOne(type => User, user => user.photos)
+    user: User;
+}
+```
+
+
+
+- "Timber"라는 유저를 그의 photo들과 함께 조회해보자.
+
+  ```ts
+  const user = await createQueryBuilder("user")
+      .leftJoinAndSelect("user.photos", "photo")
+      .where("user.name = :name", { name: "Timber" })
+      .getOne();
+  ```
+
+  - 아래와 같은 결과를 얻는다.
+
+  ```json
+  {
+      id: 1,
+      name: "Timber",
+      photos: [{
+          id: 1,
+          url: "me-with-chakram.jpg"
+      }, {
+          id: 2,
+          url: "me-with-trees.jpg"
+      }]
+  }
+  ```
+
+  
+
+- `leftJoinAndSelect(relation, alias)`
+  - `relation`: `"user.photos"`
+    - `user`의 연관 엔티티인 `photo`를 가져와라
+    - The first argument is the relation you want to load
+  - `alias`: `"photo"`
+    - `photo` 테이블의 alias를 `"photo"`로 지정하자
+    - the second argument is an alias you assign to this relation's table
+
+
+
+- 예시
+
+  ```ts
+  const user = await createQueryBuilder("user")
+      .leftJoinAndSelect("user.photos", "photo")
+      .where("user.name = :name", { name: "Timber" })
+      .andWhere("photo.isRemoved = :isRemoved", { isRemoved: false })
+      .getOne();
+  ```
+
+  ```sql
+  SELECT user.*, photo.* FROM users user
+      LEFT JOIN photos photo ON photo.user = user.id
+      WHERE user.name = 'Timber' AND photo.isRemoved = FALSE
+  ```
+
+  
+
+- "where"를 쓰는 대신 join expression에 condition을 추가할 수도 있다.
+
+  ```ts
+  const user = await createQueryBuilder("user")
+      .leftJoinAndSelect("user.photos", "photo", "photo.isRemoved = :isRemoved", { isRemoved: false })
+      .where("user.name = :name", { name: "Timber" })
+      .getOne();
+  ```
+
+  ```sql
+  SELECT user.*, photo.* FROM users user
+      LEFT JOIN photos photo ON photo.user = user.id AND photo.isRemoved = FALSE
+      WHERE user.name = 'Timber'
+  ```
+
+  
+
+
+
+## 15. Inner and left joins
+
+- `LEFT JOIN` 대신 `INNER JOIN`을 사용하고 싶으면 `innerJoinAndSelect`를 사용하면 된다.
+
+  ```ts
+  const user = await createQueryBuilder("user")
+      .innerJoinAndSelect("user.photos", "photo", "photo.isRemoved = :isRemoved", { isRemoved: false })
+      .where("user.name = :name", { name: "Timber" })
+      .getOne();
+  ```
+
+  ```sql
+  SELECT user.*, photo.* FROM users user
+      INNER JOIN photos photo ON photo.user = user.id AND photo.isRemoved = FALSE
+      WHERE user.name = 'Timber'
+  ```
 
 
 
 
 
+## 16. Join without selection
+
+- `select` 없이 data를 join 할 수 있다.
+
+  - 이를 위해서, `leftJoin`이나 `innerJoin`을 사용하자.
+
+  ```ts
+  const user = await createQueryBuilder("user")
+      .innerJoin("user.photos", "photo")
+      .where("user.name = :name", { name: "Timber" })
+      .getOne();
+  ```
+
+  ```sql
+  SELECT user.* FROM users user
+      INNER JOIN photos photo ON photo.user = user.id
+      WHERE user.name = 'Timber'
+  ```
+
+  
+
+## 17. Joining any entity or table (관계 없는 놈들끼리 조인하기)
+
+```ts
+const user = await createQueryBuilder("user")
+    .leftJoinAndSelect(Photo, "photo", "photo.userId = user.id")
+    .getMany();
+```
+
+```ts
+const user = await createQueryBuilder("user")
+    .leftJoinAndSelect("photos", "photo", "photo.userId = user.id")
+    .getMany();
+```
 
 
 
 
 
+## 18. Joining and mapping functionality
 
+- `leftJoinAndMapOne()` 메서드 
+
+Add `profilePhoto` to `User` entity and you can map any data into that property using `QueryBuilder`:
+
+```typescript
+export class User {
+    /// ...
+    profilePhoto: Photo;
+
+}
+const user = await createQueryBuilder("user")
+    .leftJoinAndMapOne("user.profilePhoto", "user.photos", "photo", "photo.isForProfile = TRUE")
+    .where("user.name = :name", { name: "Timber" })
+    .getOne();
+```
+
+This will load Timber's profile photo and set it to `user.profilePhoto`. If you want to load and map a single entity use `leftJoinAndMapOne`. If you want to load and map multiple entities use `leftJoinAndMapMany`.
+
+
+
+
+
+## 19. Getting the generated query (쿼리 로깅)
+
+- `QueryBuilder`에 의해 생성된 SQL 쿼리를 보고 싶으면 `getSql`을 쓰면 된다
+
+  ```ts
+  const sql = createQueryBuilder("user")
+      .where("user.firstName = :firstName", { firstName: "Timber" })
+      .orWhere("user.lastName = :lastName", { lastName: "Saw" })
+      .getSql();
+  ```
+
+- 디버깅 하고 싶으면 `printSql`을 사용하면 된다.
+
+  ```ts
+  const users = await createQueryBuilder("user")
+      .where("user.firstName = :firstName", { firstName: "Timber" })
+      .orWhere("user.lastName = :lastName", { lastName: "Saw" })
+      .printSql()
+      .getMany();
+  ```
+
+  - This query will return users and print the used sql statement to the console.
+
+
+
+
+
+## 20. Getting raw results
+
+- select query builder를 사용하면 두가지 종류의 결과를 얻을 수 있다.
+
+  - **entities**
+  - **raw results**
+
+- raw results를 얻어야 하는 경우
+
+  - ex) sum of all user photos
+
+    ```ts
+    const { sum } = await getRepository(User)
+        .createQueryBuilder("user")
+        .select("SUM(user.photosCount)", "sum")
+        .where("user.id = :id", { id: 1 })
+        .getRawOne();
+    ```
+
+    ```ts
+    const photosSums = await getRepository(User)
+        .createQueryBuilder("user")
+        .select("user.id")
+        .addSelect("SUM(user.photosCount)", "sum")
+        .groupBy("user.id")
+        .getRawMany();
+    
+    // result will be like this: [{ id: 1, sum: 25 }, { id: 2, sum: 13 }, ...]
+    ```
+
+    
+
+## 21. Streaming result data
+
+- You can use `stream` which returns you a stream.
+
+- Streaming returns you raw data and you must handle entity transformation manually:
+
+  ```ts
+  const stream = await getRepository(User)
+      .createQueryBuilder("user")
+      .where("user.id = :id", { id: 1 })
+      .stream();
+  ```
+
+  
+
+
+
+## 22. Using pagination
+
+- skip: 건너뛸 개수
+- take: 가져올 개수
+
+
+
+```ts
+const users = await getRepository(User)
+    .createQueryBuilder("user")
+    .leftJoinAndSelect("user.photos", "photo")
+    .take(10)
+    .getMany();
+```
+
+
+
+- `take` and `skip` may look like we are using `limit` and `offset`, but they aren't.
+- `limit` and `offset` may not work as you expect once you have more complicated queries with joins or subqueries. 
+- <u>**Using `take` and `skip` will prevent those issues.**</u>
+
+
+
+
+
+## 23. Set locking
+
+- QueryBuilder supports both optimistic and pessimistic locking. 
+
+- To use pessimistic read locking use the following method:
+
+  ```typescript
+  const users = await getRepository(User)
+      .createQueryBuilder("user")
+      .setLock("pessimistic_read")
+      .getMany();
+  ```
+
+- 
+  To use pessimistic write locking use the following method:
+
+  ```typescript
+  const users = await getRepository(User)
+      .createQueryBuilder("user")
+      .setLock("pessimistic_write")
+      .getMany();
+  ```
+
+- To use dirty read locking use the following method:
+
+  ```typescript
+  const users = await getRepository(User)
+      .createQueryBuilder("user")
+      .setLock("dirty_read")
+      .getMany();
+  ```
+
+- To use optimistic locking use the following method:
+
+  ```typescript
+  const users = await getRepository(User)
+      .createQueryBuilder("user")
+      .setLock("optimistic", existUser.version)
+      .getMany();
+  ```
+
+
+
+
+
+## 24. Max execution time
+
+```ts
+const users = await getRepository(User)
+    .createQueryBuilder("user")
+    .maxExecutionTime(1000) // milliseconds.
+    .getMany();
+```
+
+- We can drop slow query to avoid crashing the server. 
+- Only MySQL driver is supported at the moment:
+
+
+
+
+
+## 25. Partial selection
+
+- If you want to select only some entity properties, you can use the following syntax:
+
+```typescript
+const users = await getRepository(User)
+    .createQueryBuilder("user")
+    .select([
+        "user.id",
+        "user.name"
+    ])
+    .getMany();
+```
+
+This will only select the `id` and `name` of `User`.
+
+
+
+
+
+## 26. Using subqueries
+
+- You can easily create subqueries. Subqueries are supported in `FROM`, `WHERE` and `JOIN` expressions. 
+
+```ts
+const qb = await getRepository(Post).createQueryBuilder("post");
+const posts = qb
+    .where("post.title IN " + qb.subQuery().select("user.name").from(User, "user").where("user.registered = :registered").getQuery())
+    .setParameter("registered", true)
+    .getMany();
+```
+
+- 좀 더 우아한 방법
+
+```ts
+const posts = await connection.getRepository(Post)
+    .createQueryBuilder("post")
+    .where(qb => {
+        const subQuery = qb.subQuery()
+            .select("user.name")
+            .from(User, "user")
+            .where("user.registered = :registered")
+            .getQuery();
+        return "post.title IN " + subQuery;
+    })
+    .setParameter("registered", true)
+    .getMany();
+```
+
+- Alternatively, you can create a separate query builder and use its generated SQL:
+
+```ts
+const userQb = await connection.getRepository(User)
+    .createQueryBuilder("user")
+    .select("user.name")
+    .where("user.registered = :registered", { registered: true });
+
+const posts = await connection.getRepository(Post)
+    .createQueryBuilder("post")
+    .where("post.title IN (" + userQb.getQuery() + ")")
+    .setParameters(userQb.getParameters())
+    .getMany();
+```
+
+- `FROM`에서도 subquery를 쓸 수 있다.
+
+```ts
+const userQb = await connection.getRepository(User)
+    .createQueryBuilder("user")
+    .select("user.name", "name")
+    .where("user.registered = :registered", { registered: true });
+
+const posts = await connection
+    .createQueryBuilder()
+    .select("user.name", "name")
+    .from("(" + userQb.getQuery() + ")", "user")
+    .setParameters(userQb.getParameters())
+    .getRawMany();
+```
+
+- 더 우아한 방법도 있다.
+
+```ts
+const posts = await connection
+    .createQueryBuilder()
+    .select("user.name", "name")
+    .from(subQuery => {
+        return subQuery
+            .select("user.name", "name")
+            .from(User, "user")
+            .where("user.registered = :registered", { registered: true });
+    }, "user")
+    .getRawMany();
+```
+
+
+
+- If you want to add a subselect as a "second from" use `addFrom`.
+
+  You can use subselects in `SELECT` statements as well:
+
+  ```typescript
+  const posts = await connection
+      .createQueryBuilder()
+      .select("post.id", "id")
+      .addSelect(subQuery => {
+          return subQuery
+              .select("user.name", "name")
+              .from(User, "user")
+              .limit(1);
+      }, "name")
+      .from(Post, "post")
+      .getRawMany();
+  ```
+
+
+
+## 27. Hidden Columns
+
+If the model you are querying has a column with a `select: false` column, you must use the `addSelect` function in order to retrieve the information from the column.
+
+Let's say you have the following entity:
+
+```typescript
+import {Entity, PrimaryGeneratedColumn, Column} from "typeorm";
+
+@Entity()
+export class User {
+
+    @PrimaryGeneratedColumn()
+    id: number;
+
+    @Column()
+    name: string;
+
+    @Column({select: false})
+    password: string;
+}
+```
+
+Using a standard `find` or query, you will not receive the `password` property for the model. However, if you do the following:
+
+```typescript
+const users = await connection.getRepository(User)
+    .createQueryBuilder()
+    .select("user.id", "id")
+    .addSelect("user.password")
+    .getMany();
+```
+
+You will get the property `password` in your query.
+
+
+
+## 28. Querying Deleted rows
+
+If the model you are querying has a column with the attribute `@DeleteDateColumn` set, the query builder will automatically query rows which are 'soft deleted'.
+
+Let's say you have the following entity:
+
+```typescript
+import {Entity, PrimaryGeneratedColumn, Column} from "typeorm";
+
+@Entity()
+export class User {
+
+    @PrimaryGeneratedColumn()
+    id: number;
+
+    @Column()
+    name: string;
+
+    @DeleteDateColumn()
+    deletedAt?: Date;
+}
+```
+
+Using a standard `find` or query, you will not receive the rows which have a value in that row. However, if you do the following:
+
+```typescript
+const users = await connection.getRepository(User)
+    .createQueryBuilder()
+    .select("user.id", "id")
+    .withDeleted()
+    .getMany();
+```
+
+You will get all the rows, including the ones which are deleted.
 
