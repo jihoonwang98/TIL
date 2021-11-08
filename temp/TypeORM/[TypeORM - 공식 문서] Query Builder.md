@@ -1,4 +1,4 @@
-# [TypeORM - 공식 문서] Query Builder 목차
+# [TypeORM - 공식 문서] Query Builder
 
 > https://typeorm.io/#/select-query-builder
 
