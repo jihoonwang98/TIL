@@ -147,8 +147,6 @@
   - 일반 값, 클래스 및 비동기 또는 동기 팩토리를 사용할 수 있습니다. 
   - 더 많은 예가 [여기](https://docs.nestjs.kr/fundamentals/dependency-injection)에 제공됩니다.
 
-
-
 ## Optional providers
 
 - 경우에 따라 반드시 해결하지 않아도 되는 종속성이 있을 수 있습니다. 
