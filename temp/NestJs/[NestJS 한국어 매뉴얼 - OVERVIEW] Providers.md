@@ -16,7 +16,7 @@
 - Provider registration
 - Manual instantiation
 
-### 
+
 
 ## Providers
 
