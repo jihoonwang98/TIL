@@ -1,4 +1,4 @@
-# [Typescript 핸드북] 리터럴 타입
+# [Typescript 핸드북] 리터럴 타입  
 
 > https://typescript-kr.github.io/pages/literal-types.html
 
@@ -73,7 +73,7 @@
 
   - 허용된 세 개의 문자열이 아닌 다른 문자열을 사용하게 되면 오류가 발생합니다.
 
-  ```
+  ```ts
   '"uneasy"' 타입은 '"ease-in" | "ease-out" | "ease-in-out"' 타입의 매개 변수에 할당할 수 없습니다.
   ```
 
