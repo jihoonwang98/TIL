@@ -21,6 +21,7 @@ cd typeorm-test-project
 
 // typeorm 모듈 설치, postgresql 모듈 설치
 yarn add @nestjs/typeorm typeorm pg
+npm install --save @nestjs/typeorm typeorm pg
 ```
 
 
@@ -65,7 +66,18 @@ export class AppModule {}
 
 
 
+## ESLint with airbnb
 
+```
+# TypeScript
+$ npm i -D typescript
+
+# ESLint packages
+$ npm i -D eslint eslint-config-airbnb-base eslint-plugin-import
+
+# TypeScript ESLint packages
+$ npm i -D @typescript-eslint/eslint-plugin @typescript-eslint/parser
+```
 
 
 

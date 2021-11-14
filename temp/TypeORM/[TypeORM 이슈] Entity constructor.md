@@ -65,5 +65,44 @@
 
 
 
+```ts
+describe('insert dummies', () => {
+    it('test', async function() {
+      const music = new LessonEntity('music');
+      const math = new LessonEntity('math');
+      const science = new LessonEntity('science');
 
+      const alex = new StudentEntity('alex', [music, math]);
+      const john = new StudentEntity('john', [science, math]);
+      const james = new StudentEntity('james', [music, science]);
+      const mojo = new StudentEntity('mojo', [music, math, science]);
+
+      await lessonRepository.save([music, math, science]);
+      await studentRepository.save([alex, john, james, mojo]);
+    });
+  })
+
+
+@Entity()
+export default class StudentEntity {
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @Column()
+  name: string;
+
+  @ManyToMany(() => StudentEntity)
+  @JoinTable()
+  lessons: LessonEntity[];
+
+  constructor(name: string, lessons: LessonEntity[]) {
+    this.name = name;
+
+    console.log('lessons: ', lessons);
+    for (let i = 0; i < lessons.length; i++) { // TypeError: Cannot read property 'length' of undefined
+      this.lessons.push(lessons[i]);
+    }
+  }
+}
+```
 
