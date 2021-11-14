@@ -81,3 +81,42 @@ $ npm i -D @typescript-eslint/eslint-plugin @typescript-eslint/parser
 
 
 
+
+
+## `prettierrc`
+
+```json
+{
+  "singleQuote": true,
+  "parser": "typescript",
+  "semi": true,
+  "useTabs": false,
+  "tabWidth": 2,
+  "trailingComma": "all",
+  "printWidth": 120,
+  "arrowParens": "always"
+}
+```
+
+
+
+### `ormconfig.json`
+
+```json
+{
+  "name": "default",
+  "type": "postgres",
+  "host": "localhost",
+  "port": 5432,
+  "username": "mojo",
+  "password": "",
+  "database": "prac",
+  "migrationsRun": false,
+  "logging": ["query", "error"],
+  "logger": "advanced-console",
+  "entities": ["src/**/*.entity.ts"],
+  "synchronize": true
+}
+
+```
+
